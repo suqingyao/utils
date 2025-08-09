@@ -51,7 +51,7 @@ export function isBoolean(value: unknown): value is boolean {
  * @param value 要检查的值
  * @returns 是否为函数
  */
-export function isFunction(value: unknown): value is Function {
+export function isFunction(value: unknown): value is (...args: unknown[]) => unknown {
   return typeof value === 'function';
 }
 

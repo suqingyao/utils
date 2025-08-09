@@ -65,7 +65,7 @@ function normalizeKey(key: string): string {
 export function safeParse<T>(key: string): T {
   try {
     return JSON.parse(key) as T;
-  } catch (error) {
+  } catch {
     return key as T;
   }
 }
@@ -78,7 +78,7 @@ export function safeParse<T>(key: string): T {
 export function safeStringify<T>(key: T): string {
   try {
     return JSON.stringify(key);
-  } catch (error) {
+  } catch {
     return key as string;
   }
 }
@@ -104,7 +104,12 @@ export function createStorage<T>({
   prefix = keyNormalizer(prefix);
   namespace = keyNormalizer(namespace);
 
-  const storage = session ? sessionStorage : localStorage;
+  // 检查浏览器环境
+  if (typeof window === 'undefined') {
+    throw new Error('Storage utilities can only be used in browser environment');
+  }
+
+  const storage = session ? window.sessionStorage : window.localStorage;
 
   return {
     setItem(key: string, value: T): void {

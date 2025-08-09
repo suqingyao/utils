@@ -32,16 +32,18 @@ export function throttle<T extends (...args: any[]) => any>(
   const throttled = function (this: any, ...args: Parameters<T>) {
     const now = Date.now();
     const timeSinceLastCall = now - lastCallTime;
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
+    const currentThis = this;
 
     lastArgs = args;
-    lastThis = this;
+    lastThis = currentThis;
 
     const shouldCallNow = leading && timeSinceLastCall >= delay;
     const shouldScheduleCall = trailing && !timeoutId;
 
     if (shouldCallNow) {
       lastCallTime = now;
-      result = func.apply(this, args);
+      result = func.apply(currentThis, args);
     } else if (shouldScheduleCall) {
       timeoutId = setTimeout(() => {
         timeoutId = null;
