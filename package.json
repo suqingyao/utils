@@ -31,21 +31,26 @@
   ],
   "scripts": {
     "build": "tsdown",
+    "commit": "cz",
     "dev": "tsdown --watch",
-    "test": "vitest",
-    "test:ci": "vitest run",
-    "test:coverage": "vitest --coverage",
-    "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
+    "docs:dev": "vitepress dev docs",
     "docs:preview": "vitepress preview docs",
+    "postinstall": "simple-git-hooks",
     "lint": "eslint src --max-warnings 100",
     "lint:fix": "eslint src --fix",
-    "commit": "cz",
-    "release": "node scripts/release.js",
-    "release:sh": "./scripts/release.sh",
-    "release:quick": "node scripts/quick-release.js",
     "prepublishOnly": "npm run build && npm run test",
-    "postinstall": "simple-git-hooks"
+    "release": "node scripts/release.js",
+    "release:quick": "node scripts/quick-release.js",
+    "release:sh": "./scripts/release.sh",
+    "test": "vitest",
+    "test:ci": "vitest run",
+    "test:coverage": "vitest --coverage"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
   },
   "peerDependencies": {
     "typescript": ">=4.0.0"
@@ -78,9 +83,7 @@
     "vitepress": "^1.0.0",
     "vitest": "^1.0.0"
   },
-  "config": {
-    "commitizen": {
-      "path": "./node_modules/cz-conventional-changelog"
-    }
+  "publishConfig": {
+    "access": "public"
   }
 }
