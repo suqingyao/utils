@@ -39,7 +39,7 @@
     "postinstall": "simple-git-hooks",
     "lint": "eslint src --max-warnings 100",
     "lint:fix": "eslint src --fix",
-    "prepublishOnly": "npm run build && npm run test",
+    "prepublishOnly": "npm run build && npm run test:ci",
     "release": "node scripts/release.js",
     "release:quick": "node scripts/quick-release.js",
     "release:sh": "./scripts/release.sh",

@@ -6,7 +6,7 @@
  */
 
 import { execSync } from 'node:child_process';
-import { readFileSync, existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
@@ -21,17 +21,17 @@ const colors = {
   green: '\x1B[32m',
   yellow: '\x1B[33m',
   blue: '\x1B[34m',
-  reset: '\x1B[0m'
+  reset: '\x1B[0m',
 };
 
 /**
  * 日志函数
  */
 const log = {
-  info: (msg) => console.log(`${colors.blue}[INFO]${colors.reset} ${msg}`),
-  success: (msg) => console.log(`${colors.green}[SUCCESS]${colors.reset} ${msg}`),
-  warning: (msg) => console.log(`${colors.yellow}[WARNING]${colors.reset} ${msg}`),
-  error: (msg) => console.log(`${colors.red}[ERROR]${colors.reset} ${msg}`)
+  info: msg => console.log(`${colors.blue}[INFO]${colors.reset} ${msg}`),
+  success: msg => console.log(`${colors.green}[SUCCESS]${colors.reset} ${msg}`),
+  warning: msg => console.log(`${colors.yellow}[WARNING]${colors.reset} ${msg}`),
+  error: msg => console.log(`${colors.red}[ERROR]${colors.reset} ${msg}`),
 };
 
 /**
@@ -46,9 +46,10 @@ function exec(command, options = {}) {
       cwd: projectRoot,
       encoding: 'utf8',
       stdio: 'inherit',
-      ...options
+      ...options,
     });
-  } catch {
+  }
+  catch {
     log.error(`Command failed: ${command}`);
     process.exit(1);
   }
@@ -63,10 +64,11 @@ function isWorkingDirectoryClean() {
     const status = execSync('git status --porcelain', {
       cwd: projectRoot,
       encoding: 'utf8',
-      stdio: 'pipe'
+      stdio: 'pipe',
     });
     return status.trim() === '';
-  } catch {
+  }
+  catch {
     return false;
   }
 }
@@ -133,8 +135,8 @@ function quickRelease() {
 
     log.success(`Quick release v${newVersion} completed successfully!`);
     log.info('To publish to npm, run: npm publish');
-
-  } catch (error) {
+  }
+  catch (error) {
     log.error(`Quick release failed: ${error.message}`);
     process.exit(1);
   }

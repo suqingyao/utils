@@ -5,11 +5,11 @@
  * 用于自动化构建、测试和发布流程
  */
 
-import { execSync } from 'child_process';
-import { readFileSync, writeFileSync, existsSync } from 'fs';
-import { createInterface } from 'readline';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import { execSync, process } from 'node:child_process';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+import path from 'node:path';
+import { createInterface } from 'node:readline';
+import { fileURLToPath } from 'node:url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -17,21 +17,21 @@ const projectRoot = path.resolve(__dirname, '..');
 
 // 颜色定义
 const colors = {
-  red: '\x1b[31m',
-  green: '\x1b[32m',
-  yellow: '\x1b[33m',
-  blue: '\x1b[34m',
-  reset: '\x1b[0m'
+  red: '\x1B[31m',
+  green: '\x1B[32m',
+  yellow: '\x1B[33m',
+  blue: '\x1B[34m',
+  reset: '\x1B[0m',
 };
 
 /**
  * 日志函数
  */
 const log = {
-  info: (msg) => console.log(`${colors.blue}[INFO]${colors.reset} ${msg}`),
-  success: (msg) => console.log(`${colors.green}[SUCCESS]${colors.reset} ${msg}`),
-  warning: (msg) => console.log(`${colors.yellow}[WARNING]${colors.reset} ${msg}`),
-  error: (msg) => console.log(`${colors.red}[ERROR]${colors.reset} ${msg}`)
+  info: msg => console.log(`${colors.blue}[INFO]${colors.reset} ${msg}`),
+  success: msg => console.log(`${colors.green}[SUCCESS]${colors.reset} ${msg}`),
+  warning: msg => console.log(`${colors.yellow}[WARNING]${colors.reset} ${msg}`),
+  error: msg => console.log(`${colors.red}[ERROR]${colors.reset} ${msg}`),
 };
 
 /**
@@ -46,9 +46,10 @@ function exec(command, options = {}) {
       cwd: projectRoot,
       encoding: 'utf8',
       stdio: 'inherit',
-      ...options
+      ...options,
     });
-  } catch (error) {
+  }
+  catch {
     log.error(`Command failed: ${command}`);
     process.exit(1);
   }
@@ -62,7 +63,7 @@ function exec(command, options = {}) {
 function askQuestion(question) {
   const rl = createInterface({
     input: process.stdin,
-    output: process.stdout
+    output: process.stdout,
   });
 
   return new Promise((resolve) => {
@@ -82,10 +83,11 @@ function isWorkingDirectoryClean() {
     const status = execSync('git status --porcelain', {
       cwd: projectRoot,
       encoding: 'utf8',
-      stdio: 'pipe'
+      stdio: 'pipe',
     });
     return status.trim() === '';
-  } catch {
+  }
+  catch {
     return false;
   }
 }
@@ -99,9 +101,10 @@ function getCurrentBranch() {
     return execSync('git branch --show-current', {
       cwd: projectRoot,
       encoding: 'utf8',
-      stdio: 'pipe'
+      stdio: 'pipe',
     }).trim();
-  } catch {
+  }
+  catch {
     return 'unknown';
   }
 }
@@ -124,15 +127,16 @@ function getCurrentVersion() {
 function updateVersion(versionType) {
   const packagePath = path.join(projectRoot, 'package.json');
   const packageJson = JSON.parse(readFileSync(packagePath, 'utf8'));
-  
+
   if (['patch', 'minor', 'major'].includes(versionType)) {
     exec(`npm version ${versionType} --no-git-tag-version`);
-  } else {
+  }
+  else {
     // 自定义版本号
     packageJson.version = versionType;
-    writeFileSync(packagePath, JSON.stringify(packageJson, null, 2) + '\n');
+    writeFileSync(packagePath, `${JSON.stringify(packageJson, null, 2)}\n`);
   }
-  
+
   return getCurrentVersion();
 }
 
@@ -143,19 +147,19 @@ function updateVersion(versionType) {
 function checkBuildOutput() {
   const distPath = path.join(projectRoot, 'dist');
   const requiredFiles = ['index.js', 'index.cjs', 'index.d.ts'];
-  
+
   if (!existsSync(distPath)) {
     log.error('Build failed: dist directory not found');
     return false;
   }
-  
+
   for (const file of requiredFiles) {
     if (!existsSync(path.join(distPath, file))) {
       log.error(`Build failed: ${file} not found in dist directory`);
       return false;
     }
   }
-  
+
   return true;
 }
 
@@ -197,10 +201,10 @@ async function release() {
     console.log('2) minor (x.X.x)');
     console.log('3) major (X.x.x)');
     console.log('4) custom');
-    
+
     const versionChoice = await askQuestion('Enter choice (1-4): ');
     let versionType;
-    
+
     switch (versionChoice) {
       case '1':
         versionType = 'patch';
@@ -268,7 +272,8 @@ async function release() {
       log.info('Publishing to npm...');
       exec('npm publish');
       log.success('Published to npm successfully');
-    } else {
+    }
+    else {
       log.info('Skipping npm publish');
     }
 
@@ -278,8 +283,8 @@ async function release() {
     log.info(`  - Git tag: v${newVersion}`);
     log.info(`  - Branch: ${currentBranch}`);
     log.info(`  - Published to npm: ${['y', 'Y', 'yes', 'Yes'].includes(publishNpm) ? 'Yes' : 'No'}`);
-
-  } catch (error) {
+  }
+  catch (error) {
     log.error(`Release failed: ${error.message}`);
     process.exit(1);
   }
