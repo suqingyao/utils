@@ -5,10 +5,11 @@
  * 用于快速发布补丁版本，跳过一些交互步骤
  */
 
-import { execSync } from 'child_process';
-import { readFileSync, existsSync } from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import { execSync } from 'node:child_process';
+import { readFileSync, existsSync } from 'node:fs';
+import path from 'node:path';
+import process from 'node:process';
+import { fileURLToPath } from 'node:url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -16,11 +17,11 @@ const projectRoot = path.resolve(__dirname, '..');
 
 // 颜色定义
 const colors = {
-  red: '\x1b[31m',
-  green: '\x1b[32m',
-  yellow: '\x1b[33m',
-  blue: '\x1b[34m',
-  reset: '\x1b[0m'
+  red: '\x1B[31m',
+  green: '\x1B[32m',
+  yellow: '\x1B[33m',
+  blue: '\x1B[34m',
+  reset: '\x1B[0m'
 };
 
 /**
@@ -47,7 +48,7 @@ function exec(command, options = {}) {
       stdio: 'inherit',
       ...options
     });
-  } catch (error) {
+  } catch {
     log.error(`Command failed: ${command}`);
     process.exit(1);
   }
