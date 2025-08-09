@@ -3,9 +3,11 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+// 导入 DOM 类型
+import type { Document, HTMLAnchorElement } from 'happy-dom';
 import {
   http,
-  request,
+  // request, // 未使用
   get,
   post,
   put,
@@ -14,7 +16,7 @@ import {
   upload,
   download,
   batchRequest,
-  cancelRequest,
+  // cancelRequest, // 未使用
   cancelAllRequests,
   clearCache,
   setGlobalConfig,
@@ -26,8 +28,8 @@ import {
   useRequest,
   createHttpClient,
   type RequestConfig,
-  type HttpResponse,
-  type HttpError,
+  // type HttpResponse, // 未使用
+  // type HttpError, // 未使用
   type GlobalConfig,
 } from '../http';
 
@@ -56,8 +58,8 @@ const mockDocument = {
 };
 
 // 模拟全局对象
-global.window = mockWindow as any;
-global.document = mockDocument as any;
+global.window = mockWindow as unknown as Window & typeof globalThis;
+global.document = mockDocument as unknown as Document;
 
 /**
  * 创建模拟响应
@@ -71,7 +73,7 @@ function createMockResponse<T>(data: T, status = 200, statusText = 'OK'): Respon
     json: vi.fn().mockResolvedValue(data),
     text: vi.fn().mockResolvedValue(JSON.stringify(data)),
     blob: vi.fn().mockResolvedValue(new Blob([JSON.stringify(data)])),
-  } as any;
+  } as unknown as Response;
 }
 
 /**
@@ -86,7 +88,7 @@ function createMockErrorResponse(status = 500, statusText = 'Internal Server Err
     json: vi.fn().mockRejectedValue(new Error('Failed to parse JSON')),
     text: vi.fn().mockResolvedValue('Error'),
     blob: vi.fn().mockResolvedValue(new Blob(['Error'])),
-  } as any;
+  } as unknown as Response;
 }
 
 describe('HTTP 工具函数', () => {
@@ -515,14 +517,14 @@ describe('HTTP 工具函数', () => {
         text: vi.fn(),
       };
       
-      mockFetch.mockResolvedValueOnce(mockResponse as any);
+      mockFetch.mockResolvedValueOnce(mockResponse as unknown as Response);
 
       const mockLink = {
         href: '',
         download: '',
         click: vi.fn(),
       };
-      mockDocument.createElement.mockReturnValue(mockLink as any);
+      mockDocument.createElement.mockReturnValue(mockLink as unknown as HTMLAnchorElement);
 
       await download('/api/download/file.txt', 'downloaded.txt');
 
@@ -675,7 +677,7 @@ describe('HTTP 工具函数', () => {
     it('应该支持取消请求', async () => {
       // 创建一个永远不会 resolve 的 Promise 来模拟长时间运行的请求
       mockFetch.mockImplementationOnce(
-        () => new Promise(() => {}) // 永远不会 resolve
+        () => new Promise(() => { /* 永远不会 resolve */ })
       );
 
       const hookResult = useRequest({ url: '/api/hook-cancel', method: 'GET' });

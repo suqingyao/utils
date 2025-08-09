@@ -126,7 +126,7 @@ describe('EventEmitter', () => {
     });
 
     it('should handle errors in callbacks', () => {
-      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      const consoleSpy = vi.spyOn(globalThis.console, 'error').mockImplementation(() => { /* empty */ });
       const errorCallback = vi.fn(() => {
         throw new Error('Test error');
       });
