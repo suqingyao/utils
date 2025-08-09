@@ -3,8 +3,26 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-// 导入 DOM 类型
-import type { Document, HTMLAnchorElement } from 'happy-dom';
+
+// 声明 DOM 类型（由于没有安装 happy-dom，使用内联类型定义）
+type HTMLAnchorElement = HTMLElement & {
+  href: string;
+  download: string;
+};
+
+type Document = {
+  createElement: (tagName: string) => HTMLElement;
+  body: {
+    appendChild: (element: HTMLElement) => void;
+    removeChild: (element: HTMLElement) => void;
+  };
+};
+
+type HTMLElement = {
+  href?: string;
+  download?: string;
+  click: () => void;
+};
 import {
   http,
   // request, // 未使用
