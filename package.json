@@ -1,5 +1,5 @@
 {
-  "name": "outils",
+  "name": "suqingyao/outils",
   "version": "1.0.0",
   "description": "个人常用工具函数库",
   "type": "module",
@@ -32,6 +32,10 @@
     "lint:fix": "eslint src --ext .ts,.tsx --fix",
     "format": "prettier --write src/**/*.{ts,tsx}",
     "commit": "cz",
+    "release": "node scripts/release.js",
+    "release:sh": "./scripts/release.sh",
+    "release:quick": "node scripts/quick-release.js",
+    "prepublishOnly": "npm run build && npm run test",
     "postinstall": "simple-git-hooks"
   },
   "keywords": [
