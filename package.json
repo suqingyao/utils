@@ -1,7 +1,7 @@
 {
   "name": "suqingyao/utils",
   "type": "module",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "packageManager": "pnpm@10.14.0",
   "description": "个人常用工具函数库",
   "author": "suqingyao",
