@@ -22,7 +22,6 @@ coverage/
 .env.production.local
 
 # IDE
-.vscode/
 .idea/
 *.swp
 *.swo
