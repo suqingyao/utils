@@ -3,12 +3,12 @@
  * @description 规定在一个单位时间内，只能触发一次函数。如果这个单位时间内触发多次函数，只有一次生效
  */
 
-type ThrottleOptions = {
+interface ThrottleOptions {
   /** 是否在开始时立即执行 */
   leading?: boolean;
   /** 是否在结束时执行 */
   trailing?: boolean;
-};
+}
 
 /**
  * 创建节流函数
@@ -20,7 +20,7 @@ type ThrottleOptions = {
 export function throttle<T extends (...args: any[]) => any>(
   func: T,
   delay: number,
-  options: ThrottleOptions = {}
+  options: ThrottleOptions = {},
 ): T & { cancel: () => void; flush: () => void } {
   const { leading = true, trailing = true } = options;
   let lastCallTime = 0;
@@ -32,7 +32,7 @@ export function throttle<T extends (...args: any[]) => any>(
   const throttled = function (this: any, ...args: Parameters<T>) {
     const now = Date.now();
     const timeSinceLastCall = now - lastCallTime;
-    // eslint-disable-next-line @typescript-eslint/no-this-alias
+    // eslint-disable-next-line ts/no-this-alias
     const currentThis = this;
 
     lastArgs = args;
@@ -43,13 +43,14 @@ export function throttle<T extends (...args: any[]) => any>(
 
     if (shouldCallNow) {
       lastCallTime = now;
-      result = func.apply(currentThis, args);
-    } else if (shouldScheduleCall) {
+      result = func.call(currentThis, ...args);
+    }
+    else if (shouldScheduleCall) {
       timeoutId = setTimeout(() => {
         timeoutId = null;
         if (trailing && lastArgs) {
           lastCallTime = Date.now();
-          result = func.apply(lastThis, lastArgs);
+          result = func.call(lastThis, ...lastArgs);
         }
       }, delay - timeSinceLastCall);
     }
@@ -78,7 +79,7 @@ export function throttle<T extends (...args: any[]) => any>(
       clearTimeout(timeoutId);
       timeoutId = null;
       lastCallTime = Date.now();
-      result = func.apply(lastThis, lastArgs);
+      result = func.call(lastThis, ...lastArgs);
       lastArgs = null;
       lastThis = null;
     }

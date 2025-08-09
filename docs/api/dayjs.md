@@ -12,8 +12,8 @@
 ## 导入
 
 ```typescript
-import { dayjs, DATE_FORMATS } from 'outils';
-import type { Dayjs, ConfigType } from 'outils';
+import type { ConfigType, Dayjs } from 'outils';
+import { DATE_FORMATS, dayjs } from 'outils';
 
 // 或者直接导入 dayjs
 import dayjs from 'outils/dayjs-utils';
@@ -93,15 +93,15 @@ console.log(date1.isSame(date2, 'year')); // true
 
 ```typescript
 export const DATE_FORMATS = {
-  DATE: 'YYYY-MM-DD',                    // 2023-12-25
-  TIME: 'HH:mm:ss',                      // 10:30:00
-  DATETIME: 'YYYY-MM-DD HH:mm:ss',       // 2023-12-25 10:30:00
-  DATETIME_MINUTE: 'YYYY-MM-DD HH:mm',   // 2023-12-25 10:30
-  ISO: 'YYYY-MM-DDTHH:mm:ss.SSSZ',       // 2023-12-25T10:30:00.000Z
-  CHINESE_DATE: 'YYYY年MM月DD日',         // 2023年12月25日
+  DATE: 'YYYY-MM-DD', // 2023-12-25
+  TIME: 'HH:mm:ss', // 10:30:00
+  DATETIME: 'YYYY-MM-DD HH:mm:ss', // 2023-12-25 10:30:00
+  DATETIME_MINUTE: 'YYYY-MM-DD HH:mm', // 2023-12-25 10:30
+  ISO: 'YYYY-MM-DDTHH:mm:ss.SSSZ', // 2023-12-25T10:30:00.000Z
+  CHINESE_DATE: 'YYYY年MM月DD日', // 2023年12月25日
   CHINESE_DATETIME: 'YYYY年MM月DD日 HH:mm:ss', // 2023年12月25日 10:30:00
-  MONTH_DAY: 'MM-DD',                    // 12-25
-  YEAR_MONTH: 'YYYY-MM',                 // 2023-12
+  MONTH_DAY: 'MM-DD', // 12-25
+  YEAR_MONTH: 'YYYY-MM', // 2023-12
 } as const;
 ```
 
@@ -112,8 +112,8 @@ export const DATE_FORMATS = {
 ### 相对时间插件
 
 ```typescript
-import { dayjs } from 'outils';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import { dayjs } from 'outils';
 import 'dayjs/locale/zh-cn'; // 中文语言包
 
 // 扩展插件
@@ -129,9 +129,9 @@ console.log(date.from(dayjs('2023-12-25'))); // '5天前'
 ### 时区插件
 
 ```typescript
-import { dayjs } from 'outils';
-import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
+import utc from 'dayjs/plugin/utc';
+import { dayjs } from 'outils';
 
 // 扩展插件
 dayjs.extend(utc);
@@ -146,8 +146,8 @@ console.log(date.utc().format()); // 转换到 UTC
 ### 持续时间插件
 
 ```typescript
-import { dayjs } from 'outils';
 import duration from 'dayjs/plugin/duration';
+import { dayjs } from 'outils';
 
 // 扩展插件
 dayjs.extend(duration);
@@ -167,10 +167,10 @@ console.log(diff.humanize()); // '3 hours'
 ### 高级比较插件
 
 ```typescript
-import { dayjs } from 'outils';
-import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
-import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
 import isBetween from 'dayjs/plugin/isBetween';
+import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
+import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
+import { dayjs } from 'outils';
 
 // 扩展插件
 dayjs.extend(isSameOrBefore);
@@ -192,19 +192,19 @@ console.log(date.isBetween(start, end)); // true
 ### 日期范围选择器
 
 ```typescript
-import { dayjs, DATE_FORMATS } from 'outils';
+import { DATE_FORMATS, dayjs } from 'outils';
 
 function createDateRange(start: string, end: string) {
   const startDate = dayjs(start);
   const endDate = dayjs(end);
   const dates = [];
-  
+
   let current = startDate;
   while (current.isSameOrBefore(endDate, 'day')) {
     dates.push(current.format(DATE_FORMATS.DATE));
     current = current.add(1, 'day');
   }
-  
+
   return dates;
 }
 
@@ -221,7 +221,7 @@ function getWorkdays(start: string, end: string) {
   const startDate = dayjs(start);
   const endDate = dayjs(end);
   const workdays = [];
-  
+
   let current = startDate;
   while (current.isSameOrBefore(endDate, 'day')) {
     // 0 = Sunday, 6 = Saturday
@@ -230,7 +230,7 @@ function getWorkdays(start: string, end: string) {
     }
     current = current.add(1, 'day');
   }
-  
+
   return workdays;
 }
 ```
@@ -243,18 +243,18 @@ import { dayjs } from 'outils';
 function calculateAge(birthDate: string) {
   const birth = dayjs(birthDate);
   const now = dayjs();
-  
+
   return now.diff(birth, 'year');
 }
 
 function getDetailedAge(birthDate: string) {
   const birth = dayjs(birthDate);
   const now = dayjs();
-  
+
   const years = now.diff(birth, 'year');
   const months = now.diff(birth.add(years, 'year'), 'month');
   const days = now.diff(birth.add(years, 'year').add(months, 'month'), 'day');
-  
+
   return { years, months, days };
 }
 ```
@@ -263,7 +263,7 @@ function getDetailedAge(birthDate: string) {
 
 ```typescript
 // 从 dayjs 重新导出的类型
-export type { Dayjs, ConfigType } from 'dayjs';
+export type { ConfigType, Dayjs } from 'dayjs';
 
 // 日期格式常量类型
 export type DateFormat = typeof DATE_FORMATS[keyof typeof DATE_FORMATS];

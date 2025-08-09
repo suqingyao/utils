@@ -1,21 +1,21 @@
-const target = typeof window === 'undefined' ? global : window;
+const target = typeof window === 'undefined' ? globalThis : window;
 const vendors = ['webkit', 'ms', 'moz', 'o'];
 
-let raf: any = (target as unknown as Window).requestAnimationFrame;
-let caf: any = (target as unknown as Window).cancelAnimationFrame;
+let _raf: any = (target as unknown as Window).requestAnimationFrame;
+let _caf: any = (target as unknown as Window).cancelAnimationFrame;
 
-if (!raf || !caf) {
-  vendors.some(prefix => {
-    raf = (target as any)[`${prefix}RequestAnimationFrame`];
-    caf =
-      (target as any)[`${prefix}CancelAnimationFrame`] ||
-      (target as any)[`${prefix}CancelRequestAnimationFrame`];
-    return raf && caf;
+if (!_raf || !_caf) {
+  vendors.some((prefix) => {
+    _raf = (target as any)[`${prefix}RequestAnimationFrame`];
+    _caf
+      = (target as any)[`${prefix}CancelAnimationFrame`]
+        || (target as any)[`${prefix}CancelRequestAnimationFrame`];
+    return _raf && _caf;
   });
 
-  if (!raf || !caf) {
+  if (!_raf || !_caf) {
     let lastTime = 0;
-    raf = function (cb: () => void) {
+    _raf = function (cb: () => void) {
       const currentTime = Date.now();
       const diff = Math.max(0, 16 - (currentTime - lastTime));
       const timer = setTimeout(() => {
@@ -25,13 +25,13 @@ if (!raf || !caf) {
       return timer;
     };
 
-    caf = function (timer: number) {
+    _caf = function (timer: number) {
       clearTimeout(timer);
     };
   }
 }
 
-raf = raf.bind(target);
-caf = caf.bind(target);
+const raf = _raf.bind(target);
+const caf = _caf.bind(target);
 
-export { raf, caf };
+export { caf, raf };

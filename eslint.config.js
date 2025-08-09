@@ -1,62 +1,36 @@
-import js from '@eslint/js';
-import tseslint from '@typescript-eslint/eslint-plugin';
-import tsparser from '@typescript-eslint/parser';
+import antfu from '@antfu/eslint-config';
 
-export default [
-  js.configs.recommended,
+export default antfu(
   {
-    files: ['**/*.{ts,tsx}'],
-    languageOptions: {
-      parser: tsparser,
-      parserOptions: {
-        ecmaVersion: 'latest',
-        sourceType: 'module',
-      },
-      globals: {
-        // Browser globals
-        window: 'readonly',
-        document: 'readonly',
-        localStorage: 'readonly',
-        sessionStorage: 'readonly',
-        setTimeout: 'readonly',
-        clearTimeout: 'readonly',
-        setInterval: 'readonly',
-        clearInterval: 'readonly',
-        requestAnimationFrame: 'readonly',
-        cancelAnimationFrame: 'readonly',
-        URL: 'readonly',
-        URLSearchParams: 'readonly',
-        FormData: 'readonly',
-        File: 'readonly',
-        Blob: 'readonly',
-        Window: 'readonly',
-        XMLHttpRequest: 'readonly',
-        fetch: 'readonly',
-        Headers: 'readonly',
-        Request: 'readonly',
-        Response: 'readonly',
-        // Node.js globals
-        NodeJS: 'readonly',
-        global: 'readonly',
-        process: 'readonly',
-        Buffer: 'readonly',
-      },
+    // 启用 TypeScript 支持
+    typescript: true,
+    // 代码风格配置
+    stylistic: {
+      indent: 2,
+      quotes: 'single',
+      semi: true,
     },
-    plugins: {
-      '@typescript-eslint': tseslint,
-    },
+  },
+  {
+    // 忽略文件
+    ignores: ['dist/**', 'node_modules/**', 'docs'],
+  },
+  {
+    // 自定义规则
     rules: {
-      ...tseslint.configs.recommended.rules,
-      '@typescript-eslint/no-unused-vars': 'error',
+      // 允许 console 语句（开发阶段）
+      'no-console': 'warn',
+      // TypeScript 相关规则
       '@typescript-eslint/no-explicit-any': 'warn',
-      '@typescript-eslint/explicit-function-return-type': 'off',
-      '@typescript-eslint/explicit-module-boundary-types': 'off',
-      '@typescript-eslint/no-empty-function': 'warn',
-      'prefer-const': 'error',
-      'no-var': 'error',
+      'ts/no-explicit-any': 'warn',
+      '@typescript-eslint/no-unused-vars': 'error',
+      // 放宽一些严格规则
+      'unicorn/prefer-number-properties': 'warn',
+      'ts/no-this-alias': 'warn',
+      'jsdoc/check-param-names': 'warn',
+      // 关闭一些过于严格的格式化规则
+      'antfu/if-newline': 'off',
+      'style/brace-style': 'warn',
     },
-  },
-  {
-    ignores: ['dist/', 'node_modules/', 'docs/.vitepress/'],
-  },
-];
+  }
+);

@@ -23,4 +23,4 @@ export { dayjs };
 export default dayjs;
 
 // 重新导出 dayjs 的类型，方便用户使用
-export type { Dayjs, ConfigType } from 'dayjs';
+export type { ConfigType, Dayjs } from 'dayjs';

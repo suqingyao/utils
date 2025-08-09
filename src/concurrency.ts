@@ -4,12 +4,12 @@
  */
 
 type Task<T> = () => Promise<T>;
-type TaskResult<T> = {
+interface TaskResult<T> {
   status: 'fulfilled' | 'rejected';
   value?: T;
   reason?: any;
   index: number;
-};
+}
 
 /**
  * 并发控制器
@@ -35,9 +35,11 @@ export class ConcurrencyController {
         try {
           const result = await task();
           resolve(result);
-        } catch (error) {
+        }
+        catch (error) {
           reject(error);
-        } finally {
+        }
+        finally {
           this.running--;
           this.processQueue();
         }
@@ -45,7 +47,8 @@ export class ConcurrencyController {
 
       if (this.running < this.limit) {
         run();
-      } else {
+      }
+      else {
         this.queue.push(run);
       }
     });
@@ -95,7 +98,7 @@ export function concurrency(limit: number): ConcurrencyController {
  */
 export async function concurrentMap<T>(
   tasks: Array<Task<T>>,
-  limit: number
+  limit: number,
 ): Promise<Array<TaskResult<T>>> {
   const controller = new ConcurrencyController(limit);
   const results: Array<TaskResult<T>> = [];
@@ -104,7 +107,8 @@ export async function concurrentMap<T>(
     try {
       const value = await controller.execute(task);
       results[index] = { status: 'fulfilled', value, index };
-    } catch (reason) {
+    }
+    catch (reason) {
       results[index] = { status: 'rejected', reason, index };
     }
   });
@@ -123,10 +127,10 @@ export async function concurrentMap<T>(
 export async function batchExecute<T>(
   tasks: Array<Task<T>>,
   batchSize: number,
-  delay: number = 0
+  delay: number = 0,
 ): Promise<Array<TaskResult<T>>> {
   const results: Array<TaskResult<T>> = [];
-  
+
   for (let i = 0; i < tasks.length; i += batchSize) {
     const batch = tasks.slice(i, i + batchSize);
     const batchPromises = batch.map(async (task, batchIndex) => {
@@ -134,19 +138,20 @@ export async function batchExecute<T>(
       try {
         const value = await task();
         results[globalIndex] = { status: 'fulfilled', value, index: globalIndex };
-      } catch (reason) {
+      }
+      catch (reason) {
         results[globalIndex] = { status: 'rejected', reason, index: globalIndex };
       }
     });
-    
+
     await Promise.all(batchPromises);
-    
+
     // 批次间延迟
     if (delay > 0 && i + batchSize < tasks.length) {
       await new Promise(resolve => setTimeout(resolve, delay));
     }
   }
-  
+
   return results;
 }
 
@@ -160,22 +165,23 @@ export async function batchExecute<T>(
 export async function retry<T>(
   task: Task<T>,
   maxRetries: number = 3,
-  retryDelay: number = 1000
+  retryDelay: number = 1000,
 ): Promise<T> {
   let lastError: any;
-  
+
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
       return await task();
-    } catch (error) {
+    }
+    catch (error) {
       lastError = error;
-      
+
       if (attempt < maxRetries) {
         await new Promise(resolve => setTimeout(resolve, retryDelay));
       }
     }
   }
-  
+
   throw lastError;
 }
 
@@ -187,12 +193,12 @@ export async function retry<T>(
  */
 export async function withTimeout<T>(
   task: Task<T>,
-  timeout: number
+  timeout: number,
 ): Promise<T> {
   return Promise.race([
     task(),
     new Promise<never>((_, reject) => {
       setTimeout(() => reject(new Error(`Task timeout after ${timeout}ms`)), timeout);
-    })
+    }),
   ]);
 }

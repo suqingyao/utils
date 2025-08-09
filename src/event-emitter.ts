@@ -45,7 +45,8 @@ export class EventEmitter {
    * @param callback 要取消的回调函数，如果不传则取消该事件的所有订阅
    */
   off<T = any>(event: string, callback?: EventCallback<T>): void {
-    if (!this.events[event]) return;
+    if (!this.events[event])
+      return;
 
     if (!callback) {
       // 取消该事件的所有订阅
@@ -70,14 +71,16 @@ export class EventEmitter {
    * @param data 传递给回调函数的数据
    */
   emit<T = any>(event: string, data?: T): void {
-    if (!this.events[event]) return;
+    if (!this.events[event])
+      return;
 
     // 复制数组避免在回调中修改原数组导致的问题
     const callbacks = [...this.events[event]];
-    callbacks.forEach(callback => {
+    callbacks.forEach((callback) => {
       try {
         callback(data);
-      } catch (error) {
+      }
+      catch (error) {
         console.error(`Error in event callback for '${event}':`, error);
       }
     });

@@ -1,3 +1,5 @@
+import process from 'node:process';
+
 /**
  * 环境工具函数
  * @description 判断运行环境的工具函数
@@ -17,9 +19,9 @@ export function isBrowser(): boolean {
  */
 export function isNode(): boolean {
   return (
-    typeof process !== 'undefined' &&
-    process.versions != null &&
-    process.versions.node != null
+    typeof process !== 'undefined'
+    && process.versions != null
+    && process.versions.node != null
   );
 }
 
@@ -29,9 +31,9 @@ export function isNode(): boolean {
  */
 export function isWebWorker(): boolean {
   return (
-    typeof self !== 'undefined' &&
-    typeof (self as any).importScripts === 'function' &&
-    typeof navigator !== 'undefined'
+    typeof globalThis !== 'undefined'
+    && typeof (globalThis as any).importScripts === 'function'
+    && typeof navigator !== 'undefined'
   );
 }
 
@@ -58,18 +60,18 @@ export function isClient(): boolean {
 export function isDevelopment(): boolean {
   if (isBrowser()) {
     return (
-      window.location.hostname === 'localhost' ||
-      window.location.hostname === '127.0.0.1' ||
-      window.location.hostname.includes('dev') ||
-      window.location.port !== ''
+      window.location.hostname === 'localhost'
+      || window.location.hostname === '127.0.0.1'
+      || window.location.hostname.includes('dev')
+      || window.location.port !== ''
     );
   }
 
   if (isNode()) {
     return (
-      process.env.NODE_ENV === 'development' ||
-      process.env.NODE_ENV === 'dev' ||
-      !process.env.NODE_ENV
+      process.env.NODE_ENV === 'development'
+      || process.env.NODE_ENV === 'dev'
+      || !process.env.NODE_ENV
     );
   }
 
@@ -83,10 +85,10 @@ export function isDevelopment(): boolean {
 export function isProduction(): boolean {
   if (isBrowser()) {
     return (
-      window.location.hostname !== 'localhost' &&
-      window.location.hostname !== '127.0.0.1' &&
-      !window.location.hostname.includes('dev') &&
-      window.location.port === ''
+      window.location.hostname !== 'localhost'
+      && window.location.hostname !== '127.0.0.1'
+      && !window.location.hostname.includes('dev')
+      && window.location.port === ''
     );
   }
 
@@ -104,9 +106,12 @@ export function isProduction(): boolean {
  * @returns 环境类型字符串
  */
 export function getEnvironment(): 'browser' | 'node' | 'webworker' | 'unknown' {
-  if (isBrowser()) return 'browser';
-  if (isNode()) return 'node';
-  if (isWebWorker()) return 'webworker';
+  if (isBrowser())
+    return 'browser';
+  if (isNode())
+    return 'node';
+  if (isWebWorker())
+    return 'webworker';
   return 'unknown';
 }
 
@@ -126,7 +131,8 @@ export function getUserAgent(): string {
  * @returns 是否为移动设备
  */
 export function isMobile(): boolean {
-  if (!isBrowser()) return false;
+  if (!isBrowser())
+    return false;
 
   const userAgent = getUserAgent().toLowerCase();
   const mobileKeywords = [
@@ -156,12 +162,13 @@ export function isDesktop(): boolean {
  * @returns 是否支持触摸
  */
 export function isTouchDevice(): boolean {
-  if (!isBrowser()) return false;
+  if (!isBrowser())
+    return false;
 
   return (
-    'ontouchstart' in window ||
-    navigator.maxTouchPoints > 0 ||
-    (navigator as any).msMaxTouchPoints > 0
+    'ontouchstart' in window
+    || navigator.maxTouchPoints > 0
+    || (navigator as any).msMaxTouchPoints > 0
   );
 }
 
@@ -176,16 +183,21 @@ export function getOS():
   | 'ios'
   | 'android'
   | 'unknown' {
-  if (!isBrowser()) return 'unknown';
+  if (!isBrowser())
+    return 'unknown';
 
   const userAgent = getUserAgent().toLowerCase();
 
-  if (userAgent.includes('windows')) return 'windows';
+  if (userAgent.includes('windows'))
+    return 'windows';
   if (userAgent.includes('mac os') || userAgent.includes('macos'))
     return 'macos';
-  if (userAgent.includes('linux')) return 'linux';
-  if (userAgent.includes('iphone') || userAgent.includes('ipad')) return 'ios';
-  if (userAgent.includes('android')) return 'android';
+  if (userAgent.includes('linux'))
+    return 'linux';
+  if (userAgent.includes('iphone') || userAgent.includes('ipad'))
+    return 'ios';
+  if (userAgent.includes('android'))
+    return 'android';
 
   return 'unknown';
 }
@@ -202,18 +214,23 @@ export function getBrowser():
   | 'ie'
   | 'opera'
   | 'unknown' {
-  if (!isBrowser()) return 'unknown';
+  if (!isBrowser())
+    return 'unknown';
 
   const userAgent = getUserAgent().toLowerCase();
 
   if (userAgent.includes('chrome') && !userAgent.includes('edge'))
     return 'chrome';
-  if (userAgent.includes('firefox')) return 'firefox';
+  if (userAgent.includes('firefox'))
+    return 'firefox';
   if (userAgent.includes('safari') && !userAgent.includes('chrome'))
     return 'safari';
-  if (userAgent.includes('edge')) return 'edge';
-  if (userAgent.includes('trident') || userAgent.includes('msie')) return 'ie';
-  if (userAgent.includes('opera') || userAgent.includes('opr')) return 'opera';
+  if (userAgent.includes('edge'))
+    return 'edge';
+  if (userAgent.includes('trident') || userAgent.includes('msie'))
+    return 'ie';
+  if (userAgent.includes('opera') || userAgent.includes('opr'))
+    return 'opera';
 
   return 'unknown';
 }

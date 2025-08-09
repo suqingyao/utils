@@ -3,30 +3,30 @@
  * @description 测试 type.ts 中的所有类型判断和转换函数
  */
 
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import {
   getType,
-  isString,
-  isNumber,
-  isBoolean,
-  isFunction,
-  isObject,
   isArray,
-  isNull,
-  isUndefined,
-  isNil,
-  isEmpty,
-  isDate,
-  isRegExp,
-  isPromise,
-  isError,
-  isSymbol,
   isBigInt,
+  isBoolean,
+  isDate,
+  isEmpty,
+  isError,
+  isFunction,
+  isNil,
+  isNull,
+  isNumber,
+  isObject,
+  isPromise,
+  isRegExp,
+  isString,
+  isSymbol,
+  isUndefined,
   safeJsonParse,
   safeJsonStringify,
-  toString,
+  toBoolean,
   toNumber,
-  toBoolean
+  toString,
 } from '../type';
 
 describe('类型工具函数', () => {
@@ -39,7 +39,11 @@ describe('类型工具函数', () => {
       expect(getType({})).toBe('object');
       expect(getType(null)).toBe('null');
       expect(getType(undefined)).toBe('undefined');
-      expect(getType(() => {})).toBe('function');
+      expect(
+        getType(() => {
+          /* 空函数用于测试 */
+        })
+      ).toBe('function');
       expect(getType(new Date())).toBe('date');
       expect(getType(/test/)).toBe('regexp');
       expect(getType(Symbol('test'))).toBe('symbol');
@@ -70,7 +74,7 @@ describe('类型工具函数', () => {
       expect(isNumber(Number.MIN_VALUE)).toBe(true);
       expect(isNumber(Infinity)).toBe(true);
       expect(isNumber(-Infinity)).toBe(true);
-      expect(isNumber(NaN)).toBe(false); // NaN 不被认为是有效数字
+      expect(isNumber(Number.NaN)).toBe(false); // NaN 不被认为是有效数字
       expect(isNumber('123')).toBe(false);
       expect(isNumber(null)).toBe(false);
       expect(isNumber(undefined)).toBe(false);
@@ -92,10 +96,26 @@ describe('类型工具函数', () => {
 
   describe('isFunction', () => {
     it('应该正确判断函数类型', () => {
-      expect(isFunction(() => {})).toBe(true);
-      expect(isFunction(function() {})).toBe(true);
-      expect(isFunction(async () => {})).toBe(true);
-      expect(isFunction(function* () {})).toBe(true);
+      expect(
+        isFunction(() => {
+          /* 空函数用于测试 */
+        })
+      ).toBe(true);
+      expect(
+        isFunction(() => {
+          /* 空函数用于测试 */
+        })
+      ).toBe(true);
+      expect(
+        isFunction(async () => {
+          /* 空异步函数用于测试 */
+        })
+      ).toBe(true);
+      expect(
+        isFunction(function* () {
+          /* 空生成器函数用于测试 */
+        })
+      ).toBe(true);
       expect(isFunction(Array.prototype.push)).toBe(true);
       expect(isFunction(Date)).toBe(true);
       expect(isFunction('function')).toBe(false);
@@ -110,7 +130,7 @@ describe('类型工具函数', () => {
       expect(isObject({ a: 1 })).toBe(true);
       expect(isObject(new Date())).toBe(true);
       expect(isObject(/test/)).toBe(true);
-      expect(isObject(new Error())).toBe(true);
+      expect(isObject(new Error('test error'))).toBe(true);
       expect(isObject(null)).toBe(false);
       expect(isObject([])).toBe(false);
       expect(isObject('object')).toBe(false);
@@ -123,7 +143,7 @@ describe('类型工具函数', () => {
     it('应该正确判断数组类型', () => {
       expect(isArray([])).toBe(true);
       expect(isArray([1, 2, 3])).toBe(true);
-      expect(isArray(new Array(5))).toBe(true);
+      expect(isArray(Array.from({ length: 5 }))).toBe(true);
       expect(isArray(Array.from('hello'))).toBe(true);
       expect(isArray({})).toBe(false);
       expect(isArray('array')).toBe(false);
@@ -173,22 +193,22 @@ describe('类型工具函数', () => {
       // null 和 undefined
       expect(isEmpty(null)).toBe(true);
       expect(isEmpty(undefined)).toBe(true);
-      
+
       // 空字符串
       expect(isEmpty('')).toBe(true);
       expect(isEmpty('hello')).toBe(false);
       expect(isEmpty(' ')).toBe(false); // 空格不算空
-      
+
       // 空数组
       expect(isEmpty([])).toBe(true);
       expect(isEmpty([1])).toBe(false);
       expect(isEmpty([undefined])).toBe(false); // 包含元素就不算空
-      
+
       // 空对象
       expect(isEmpty({})).toBe(true);
       expect(isEmpty({ a: 1 })).toBe(false);
       expect(isEmpty({ a: undefined })).toBe(false); // 有属性就不算空
-      
+
       // 其他类型
       expect(isEmpty(0)).toBe(false);
       expect(isEmpty(false)).toBe(false);
@@ -212,7 +232,7 @@ describe('类型工具函数', () => {
   describe('isRegExp', () => {
     it('应该正确判断正则表达式', () => {
       expect(isRegExp(/test/)).toBe(true);
-      expect(isRegExp(new RegExp('test'))).toBe(true);
+      expect(isRegExp(/test/)).toBe(true);
       expect(isRegExp(/test/gi)).toBe(true);
       expect(isRegExp('test')).toBe(false);
       expect(isRegExp('/test/')).toBe(false);
@@ -224,13 +244,31 @@ describe('类型工具函数', () => {
   describe('isPromise', () => {
     it('应该正确判断Promise对象', () => {
       expect(isPromise(Promise.resolve())).toBe(true);
-      expect(isPromise(Promise.reject().catch(() => {}))).toBe(true);
-      expect(isPromise(new Promise(() => {}))).toBe(true);
-      
+      expect(
+        isPromise(
+          Promise.reject(new Error('test')).catch(() => {
+            /* 空函数用于测试 */
+          })
+        )
+      ).toBe(true);
+      expect(
+        isPromise(
+          new Promise(() => {
+            /* 空函数用于测试 */
+          })
+        )
+      ).toBe(true);
+
       // thenable 对象
-      expect(isPromise({ then: () => {} })).toBe(true);
+      expect(
+        isPromise({
+          then: () => {
+            /* 空函数用于测试 */
+          },
+        })
+      ).toBe(true);
       expect(isPromise({ then: 'not a function' })).toBe(false);
-      
+
       expect(isPromise('promise')).toBe(false);
       expect(isPromise({})).toBe(false);
       expect(isPromise(null)).toBe(false);
@@ -239,11 +277,11 @@ describe('类型工具函数', () => {
 
   describe('isError', () => {
     it('应该正确判断Error对象', () => {
-      expect(isError(new Error())).toBe(true);
+      expect(isError(new Error('test error'))).toBe(true);
       expect(isError(new Error('test'))).toBe(true);
-      expect(isError(new TypeError())).toBe(true);
-      expect(isError(new ReferenceError())).toBe(true);
-      expect(isError(new SyntaxError())).toBe(true);
+      expect(isError(new TypeError('type error'))).toBe(true);
+      expect(isError(new ReferenceError('reference error'))).toBe(true);
+      expect(isError(new SyntaxError('syntax error'))).toBe(true);
       expect(isError('error')).toBe(false);
       expect(isError({ message: 'error' })).toBe(false);
       expect(isError({})).toBe(false);
@@ -253,7 +291,7 @@ describe('类型工具函数', () => {
 
   describe('isSymbol', () => {
     it('应该正确判断Symbol类型', () => {
-      expect(isSymbol(Symbol())).toBe(true);
+      expect(isSymbol(Symbol('test symbol'))).toBe(true);
       expect(isSymbol(Symbol('test'))).toBe(true);
       expect(isSymbol(Symbol.for('test'))).toBe(true);
       expect(isSymbol(Symbol.iterator)).toBe(true);
@@ -283,7 +321,7 @@ describe('类型工具函数', () => {
       expect(safeJsonParse('123', 0)).toBe(123);
       expect(safeJsonParse('true', false)).toBe(true);
       expect(safeJsonParse('null', 'default')).toBe(null);
-      
+
       // 解析失败的情况
       expect(safeJsonParse('invalid json', 'default')).toBe('default');
       expect(safeJsonParse('{invalid}', {})).toEqual({});
@@ -299,15 +337,22 @@ describe('类型工具函数', () => {
       expect(safeJsonStringify(123)).toBe('123');
       expect(safeJsonStringify(true)).toBe('true');
       expect(safeJsonStringify(null)).toBe('null');
-      
+
       // 序列化失败的情况（循环引用）
-      const circular: any = {};
+      const circular: Record<string, unknown> = {};
       circular.self = circular;
       expect(safeJsonStringify(circular)).toBe('{}');
       expect(safeJsonStringify(circular, 'error')).toBe('error');
-      
+
       // 包含函数的对象
-      expect(safeJsonStringify({ a: 1, b: () => {} })).toBe('{"a":1}');
+      expect(
+        safeJsonStringify({
+          a: 1,
+          b: () => {
+            /* 空函数用于测试 */
+          },
+        })
+      ).toBe('{"a":1}');
     });
   });
 
@@ -323,9 +368,9 @@ describe('类型工具函数', () => {
       expect(toString([1, 2, 3])).toBe('[1,2,3]');
       expect(toString(Symbol('test'))).toBe('Symbol(test)');
       expect(toString(BigInt(123))).toBe('123');
-      
+
       // 特殊情况
-      const circular: any = {};
+      const circular: Record<string, unknown> = {};
       circular.self = circular;
       expect(toString(circular)).toBe(''); // 循环引用返回空字符串
     });
@@ -354,7 +399,7 @@ describe('类型工具函数', () => {
       // 布尔值直接返回
       expect(toBoolean(true)).toBe(true);
       expect(toBoolean(false)).toBe(false);
-      
+
       // 字符串转换
       expect(toBoolean('true')).toBe(true);
       expect(toBoolean('TRUE')).toBe(true);
@@ -367,14 +412,14 @@ describe('类型工具函数', () => {
       expect(toBoolean('no')).toBe(false);
       expect(toBoolean('abc')).toBe(false);
       expect(toBoolean('')).toBe(false);
-      
+
       // 数字转换
       expect(toBoolean(1)).toBe(true);
       expect(toBoolean(-1)).toBe(true);
       expect(toBoolean(123)).toBe(true);
       expect(toBoolean(0)).toBe(false);
       expect(toBoolean(0.0)).toBe(false);
-      
+
       // 其他类型基于isEmpty判断
       expect(toBoolean({})).toBe(false); // 空对象
       expect(toBoolean({ a: 1 })).toBe(true); // 非空对象
@@ -383,7 +428,11 @@ describe('类型工具函数', () => {
       expect(toBoolean(null)).toBe(false);
       expect(toBoolean(undefined)).toBe(false);
       expect(toBoolean(new Date())).toBe(false); // Date 对象被 isEmpty 认为是空的
-      expect(toBoolean(() => {})).toBe(true); // 函数对象不被 isEmpty 认为是空的
+      expect(
+        toBoolean(() => {
+          /* 空函数用于测试 */
+        })
+      ).toBe(true); // 函数对象不被 isEmpty 认为是空的
     });
   });
 });

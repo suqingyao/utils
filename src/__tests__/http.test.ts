@@ -2,58 +2,43 @@
  * HTTP 工具函数单元测试
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-
-// 声明 DOM 类型（由于没有安装 happy-dom，使用内联类型定义）
-type HTMLAnchorElement = HTMLElement & {
-  href: string;
-  download: string;
-};
-
-type Document = {
-  createElement: (tagName: string) => HTMLElement;
-  body: {
-    appendChild: (element: HTMLElement) => void;
-    removeChild: (element: HTMLElement) => void;
-  };
-};
-
-type HTMLElement = {
-  href?: string;
-  download?: string;
-  click: () => void;
-};
+import type { GlobalConfig, RequestConfig } from '../http';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
-  http,
-  // request, // 未使用
-  get,
-  post,
-  put,
-  del,
-  patch,
-  upload,
-  download,
-  batchRequest,
-  // cancelRequest, // 未使用
-  cancelAllRequests,
-  clearCache,
-  setGlobalConfig,
-  getGlobalConfig,
+  addErrorInterceptor,
   addRequestInterceptor,
   addResponseInterceptor,
-  addErrorInterceptor,
+  batchRequest,
+  cancelAllRequests,
+  clearCache,
   clearInterceptors,
-  useRequest,
   createHttpClient,
-  type RequestConfig,
-  // type HttpResponse, // 未使用
-  // type HttpError, // 未使用
-  type GlobalConfig,
+  del,
+  download,
+  get,
+  getGlobalConfig,
+  http,
+  patch,
+  post,
+  put,
+  setGlobalConfig,
+  upload,
+  useRequest,
 } from '../http';
+
+// 使用 happy-dom 提供的 DOM 类型定义
+import 'happy-dom';
+
+// Mock DOM 元素类型
+interface MockHTMLAnchorElement {
+  href: string;
+  download: string;
+  click: ReturnType<typeof vi.fn>;
+}
 
 // Mock fetch API
 const mockFetch = vi.fn();
-global.fetch = mockFetch;
+globalThis.fetch = mockFetch;
 
 // Mock DOM APIs for download tests
 const mockWindow = {
@@ -76,13 +61,17 @@ const mockDocument = {
 };
 
 // 模拟全局对象
-global.window = mockWindow as unknown as Window & typeof globalThis;
-global.document = mockDocument as unknown as Document;
+globalThis.window = mockWindow as unknown as Window & typeof globalThis;
+globalThis.document = mockDocument as unknown as Document;
 
 /**
  * 创建模拟响应
  */
-function createMockResponse<T>(data: T, status = 200, statusText = 'OK'): Response {
+function createMockResponse<T>(
+  data: T,
+  status = 200,
+  statusText = 'OK'
+): Response {
   return {
     ok: status >= 200 && status < 300,
     status,
@@ -97,7 +86,10 @@ function createMockResponse<T>(data: T, status = 200, statusText = 'OK'): Respon
 /**
  * 创建模拟错误响应
  */
-function createMockErrorResponse(status = 500, statusText = 'Internal Server Error'): Response {
+function createMockErrorResponse(
+  status = 500,
+  statusText = 'Internal Server Error'
+): Response {
   return {
     ok: false,
     status,
@@ -109,12 +101,12 @@ function createMockErrorResponse(status = 500, statusText = 'Internal Server Err
   } as unknown as Response;
 }
 
-describe('HTTP 工具函数', () => {
+describe('hTTP 工具函数', () => {
   beforeEach(() => {
     // 重置所有 mock
     vi.clearAllMocks();
     vi.resetAllMocks();
-    
+
     // 重置全局配置
     setGlobalConfig({
       timeout: 10000,
@@ -124,13 +116,13 @@ describe('HTTP 工具函数', () => {
       cacheTime: 300000,
       maxConcurrent: 6,
     });
-    
+
     // 清空缓存
     clearCache();
-    
+
     // 清理拦截器
     clearInterceptors();
-    
+
     // 重置 fetch mock
     mockFetch.mockClear();
   });
@@ -304,9 +296,13 @@ describe('HTTP 工具函数', () => {
 
   describe('错误处理', () => {
     it('应该处理 HTTP 错误状态', async () => {
-      mockFetch.mockResolvedValueOnce(createMockErrorResponse(404, 'Not Found'));
+      mockFetch.mockResolvedValueOnce(
+        createMockErrorResponse(404, 'Not Found')
+      );
 
-      await expect(get('/api/notfound')).rejects.toThrow('HTTP Error: 404 Not Found');
+      await expect(get('/api/notfound')).rejects.toThrow(
+        'HTTP Error: 404 Not Found'
+      );
     });
 
     it('应该处理网络错误', async () => {
@@ -350,7 +346,7 @@ describe('HTTP 工具函数', () => {
 
   describe('拦截器', () => {
     it('应该执行请求拦截器', async () => {
-      const requestInterceptor = vi.fn((config) => ({
+      const requestInterceptor = vi.fn(config => ({
         ...config,
         headers: { ...config.headers, 'X-Intercepted': 'true' },
       }));
@@ -374,7 +370,7 @@ describe('HTTP 工具函数', () => {
     });
 
     it('应该执行响应拦截器', async () => {
-      const responseInterceptor = vi.fn((response) => ({
+      const responseInterceptor = vi.fn(response => ({
         ...response,
         data: { ...response.data, intercepted: true },
       }));
@@ -391,8 +387,8 @@ describe('HTTP 工具函数', () => {
     });
 
     it('应该执行错误拦截器', async () => {
-      const errorInterceptor = vi.fn((error) => {
-        error.message = 'Intercepted: ' + error.message;
+      const errorInterceptor = vi.fn(error => {
+        error.message = `Intercepted: ${error.message}`;
         return error;
       });
 
@@ -400,7 +396,9 @@ describe('HTTP 工具函数', () => {
 
       mockFetch.mockRejectedValueOnce(new Error('Original Error'));
 
-      await expect(get('/api/test')).rejects.toThrow('Intercepted: Original Error');
+      await expect(get('/api/test')).rejects.toThrow(
+        'Intercepted: Original Error'
+      );
       expect(errorInterceptor).toHaveBeenCalled();
     });
   });
@@ -488,7 +486,9 @@ describe('HTTP 工具函数', () => {
       const mockData = { uploaded: true };
       mockFetch.mockResolvedValueOnce(createMockResponse(mockData));
 
-      const file = new File(['test content'], 'test.txt', { type: 'text/plain' });
+      const file = new File(['test content'], 'test.txt', {
+        type: 'text/plain',
+      });
       const response = await upload('/api/upload', file);
 
       expect(mockFetch).toHaveBeenCalledWith(
@@ -523,7 +523,7 @@ describe('HTTP 工具函数', () => {
   describe('文件下载', () => {
     it('应该下载文件', async () => {
       const mockBlob = new Blob(['file content'], { type: 'text/plain' });
-      
+
       // 创建一个 mock 响应，没有 Content-Type 头部，这样会默认解析为 blob
       const mockResponse = {
         ok: true,
@@ -534,7 +534,7 @@ describe('HTTP 工具函数', () => {
         json: vi.fn(),
         text: vi.fn(),
       };
-      
+
       mockFetch.mockResolvedValueOnce(mockResponse as unknown as Response);
 
       const mockLink = {
@@ -542,7 +542,9 @@ describe('HTTP 工具函数', () => {
         download: '',
         click: vi.fn(),
       };
-      mockDocument.createElement.mockReturnValue(mockLink as unknown as HTMLAnchorElement);
+      mockDocument.createElement.mockReturnValue(
+        mockLink as unknown as MockHTMLAnchorElement
+      );
 
       await download('/api/download/file.txt', 'downloaded.txt');
 
@@ -589,7 +591,7 @@ describe('HTTP 工具函数', () => {
     });
   });
 
-  describe('HTTP 客户端实例', () => {
+  describe('hTTP 客户端实例', () => {
     it('应该创建独立的客户端实例', async () => {
       const client = createHttpClient({
         baseURL: 'https://api.example.com',
@@ -614,7 +616,7 @@ describe('HTTP 工具函数', () => {
 
     it('客户端应该有独立的拦截器', async () => {
       const client = createHttpClient();
-      const clientInterceptor = vi.fn((config) => ({
+      const clientInterceptor = vi.fn(config => ({
         ...config,
         headers: { ...config.headers, 'X-Client-Interceptor': 'true' },
       }));
@@ -695,7 +697,10 @@ describe('HTTP 工具函数', () => {
     it('应该支持取消请求', async () => {
       // 创建一个永远不会 resolve 的 Promise 来模拟长时间运行的请求
       mockFetch.mockImplementationOnce(
-        () => new Promise(() => { /* 永远不会 resolve */ })
+        () =>
+          new Promise(() => {
+            /* 永远不会 resolve */
+          })
       );
 
       const hookResult = useRequest({ url: '/api/hook-cancel', method: 'GET' });
@@ -710,12 +715,15 @@ describe('HTTP 工具函数', () => {
     it('应该支持刷新请求', async () => {
       const mockData1 = { version: 1 };
       const mockData2 = { version: 2 };
-      
+
       mockFetch
         .mockResolvedValueOnce(createMockResponse(mockData1))
         .mockResolvedValueOnce(createMockResponse(mockData2));
 
-      const hookResult = useRequest({ url: '/api/refresh-test', method: 'GET' });
+      const hookResult = useRequest({
+        url: '/api/refresh-test',
+        method: 'GET',
+      });
 
       // 等待第一次请求完成
       await new Promise(resolve => setTimeout(resolve, 10));

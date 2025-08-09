@@ -12,11 +12,11 @@ export function compose<T>(...fns: Array<(arg: any) => any>): (arg: T) => any {
   if (fns.length === 0) {
     return (arg: T) => arg;
   }
-  
+
   if (fns.length === 1) {
     return fns[0];
   }
-  
+
   return fns.reduce((a, b) => (arg: T) => a(b(arg)));
 }
 
@@ -29,11 +29,11 @@ export function pipe<T>(...fns: Array<(arg: any) => any>): (arg: T) => any {
   if (fns.length === 0) {
     return (arg: T) => arg;
   }
-  
+
   if (fns.length === 1) {
     return fns[0];
   }
-  
+
   return fns.reduce((a, b) => (arg: T) => b(a(arg)));
 }
 
@@ -48,11 +48,11 @@ export function composeAsync<T>(
   if (fns.length === 0) {
     return async (arg: T) => arg;
   }
-  
+
   if (fns.length === 1) {
     return async (arg: T) => await fns[0](arg);
   }
-  
+
   return async (arg: T) => {
     let result = arg;
     for (let i = fns.length - 1; i >= 0; i--) {
@@ -73,11 +73,11 @@ export function pipeAsync<T>(
   if (fns.length === 0) {
     return async (arg: T) => arg;
   }
-  
+
   if (fns.length === 1) {
     return async (arg: T) => await fns[0](arg);
   }
-  
+
   return async (arg: T) => {
     let result = arg;
     for (const fn of fns) {
@@ -98,7 +98,7 @@ export function pipeAsync<T>(
 export function when<T, R>(
   condition: (arg: T) => boolean,
   trueFn: (arg: T) => R,
-  falseFn?: (arg: T) => R
+  falseFn?: (arg: T) => R,
 ): (arg: T) => R | T {
   return (arg: T) => {
     if (condition(arg)) {
@@ -120,7 +120,7 @@ export function branch<T, R>(
     condition: (arg: T) => boolean;
     fn: (arg: T) => R;
   }>,
-  defaultFn?: (arg: T) => R
+  defaultFn?: (arg: T) => R,
 ): (arg: T) => R | T {
   return (arg: T) => {
     for (const { condition, fn } of branches) {

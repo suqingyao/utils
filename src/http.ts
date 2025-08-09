@@ -107,13 +107,13 @@ let globalConfig: GlobalConfig = {
   maxConcurrent: 6,
 };
 
-let requestInterceptors: RequestInterceptor[] = [];
-let responseInterceptors: ResponseInterceptor[] = [];
-let errorInterceptors: ErrorInterceptor[] = [];
+const requestInterceptors: RequestInterceptor[] = [];
+const responseInterceptors: ResponseInterceptor[] = [];
+const errorInterceptors: ErrorInterceptor[] = [];
 
 const activeRequests = new Map<string, AbortController>();
 const requestQueue: Array<() => Promise<any>> = [];
-let runningRequests = 0;
+const runningRequests = 0;
 
 /**
  * 设置全局配置
@@ -165,14 +165,6 @@ export function clearInterceptors(): void {
 }
 
 /**
- * 生成请求ID
- * @returns 唯一请求ID
- */
-function generateRequestId(): string {
-  return Math.random().toString(36).substr(2, 9) + Date.now().toString(36);
-}
-
-/**
  * 生成缓存键
  * @param config 请求配置
  * @returns 缓存键
@@ -189,7 +181,8 @@ function getCacheKey(config: RequestConfig): string {
  */
 function getFromCache<T>(key: string): HttpResponse<T> | null {
   const cached = cache.get(key);
-  if (!cached) return null;
+  if (!cached)
+    return null;
 
   const now = Date.now();
   if (now - cached.timestamp > cached.ttl) {
@@ -270,7 +263,8 @@ function buildURL(url: string, params?: Record<string, any>): string {
  * @returns 处理后的请求体
  */
 function processRequestBody(body: any, headers: Record<string, string>): any {
-  if (!body) return undefined;
+  if (!body)
+    return undefined;
 
   if (body instanceof FormData) {
     // FormData 不需要设置 Content-Type，浏览器会自动设置
@@ -295,7 +289,7 @@ function processRequestBody(body: any, headers: Record<string, string>): any {
  * @returns Promise<HttpResponse>
  */
 async function performRequest<T = any>(
-  config: RequestConfig
+  config: RequestConfig,
 ): Promise<HttpResponse<T>> {
   const {
     url,
@@ -349,7 +343,7 @@ async function performRequest<T = any>(
 
     if (!response.ok) {
       const error = new Error(
-        `HTTP Error: ${response.status} ${response.statusText}`
+        `HTTP Error: ${response.status} ${response.statusText}`,
       ) as HttpError;
       error.status = response.status;
       error.config = config;
@@ -362,9 +356,11 @@ async function performRequest<T = any>(
 
     if (contentType?.includes('application/json')) {
       data = await response.json();
-    } else if (contentType?.includes('text/')) {
+    }
+    else if (contentType?.includes('text/')) {
       data = (await response.text()) as unknown as T;
-    } else {
+    }
+    else {
       data = (await response.blob()) as unknown as T;
     }
 
@@ -375,7 +371,8 @@ async function performRequest<T = any>(
       headers: response.headers,
       config,
     };
-  } finally {
+  }
+  finally {
     clearTimeout(timeoutId);
   }
 }
@@ -386,16 +383,17 @@ async function performRequest<T = any>(
  * @returns Promise<HttpResponse>
  */
 async function executeRequest<T = any>(
-  config: RequestConfig
+  config: RequestConfig,
 ): Promise<HttpResponse<T>> {
   const retries = config.retries ?? globalConfig.retries!;
   const retryDelay = config.retryDelay ?? globalConfig.retryDelay!;
-  let lastError: HttpError;
+  let lastError: HttpError | undefined;
 
   for (let attempt = 0; attempt <= retries; attempt++) {
     try {
       return await performRequest<T>(config);
-    } catch (error) {
+    }
+    catch (error) {
       lastError = error as HttpError;
 
       // 如果是最后一次尝试或者是取消请求，直接抛出错误
@@ -404,30 +402,12 @@ async function executeRequest<T = any>(
       }
 
       // 等待重试延迟（指数退避）
-      await delay(retryDelay * Math.pow(2, attempt));
+      await delay(retryDelay * 2 ** attempt);
     }
   }
 
-  throw lastError!;
-}
-
-/**
- * 并发控制队列处理
- */
-async function processQueue(): Promise<void> {
-  while (
-    requestQueue.length > 0 &&
-    runningRequests < globalConfig.maxConcurrent!
-  ) {
-    const request = requestQueue.shift();
-    if (request) {
-      runningRequests++;
-      request().finally(() => {
-        runningRequests--;
-        processQueue();
-      });
-    }
-  }
+  // 这行代码理论上不会执行到，因为循环中会 return 或 throw
+  throw new Error(lastError?.message || 'Request failed after retries');
 }
 
 /**
@@ -436,7 +416,7 @@ async function processQueue(): Promise<void> {
  * @returns Promise<HttpResponse>
  */
 export async function request<T = any>(
-  config: RequestConfig
+  config: RequestConfig,
 ): Promise<HttpResponse<T>> {
   // 应用请求拦截器
   let processedConfig = { ...config };
@@ -472,7 +452,8 @@ export async function request<T = any>(
       }
 
       return response;
-    } catch (error) {
+    }
+    catch (error) {
       // 应用错误拦截器
       let processedError = error as HttpError;
       for (const interceptor of errorInterceptors) {
@@ -486,7 +467,7 @@ export async function request<T = any>(
   if (runningRequests >= globalConfig.maxConcurrent!) {
     return new Promise((resolve, reject) => {
       requestQueue.push(() =>
-        executeRequestWithInterceptors().then(resolve).catch(reject)
+        executeRequestWithInterceptors().then(resolve).catch(reject),
       );
     });
   }
@@ -502,7 +483,7 @@ export async function request<T = any>(
  */
 export function get<T = any>(
   url: string,
-  config?: Omit<RequestConfig, 'url' | 'method'>
+  config?: Omit<RequestConfig, 'url' | 'method'>,
 ): Promise<HttpResponse<T>> {
   return request<T>({ ...config, url, method: 'GET' });
 }
@@ -517,7 +498,7 @@ export function get<T = any>(
 export function post<T = any>(
   url: string,
   body?: any,
-  config?: Omit<RequestConfig, 'url' | 'method' | 'body'>
+  config?: Omit<RequestConfig, 'url' | 'method' | 'body'>,
 ): Promise<HttpResponse<T>> {
   return request<T>({ ...config, url, method: 'POST', body });
 }
@@ -532,7 +513,7 @@ export function post<T = any>(
 export function put<T = any>(
   url: string,
   body?: any,
-  config?: Omit<RequestConfig, 'url' | 'method' | 'body'>
+  config?: Omit<RequestConfig, 'url' | 'method' | 'body'>,
 ): Promise<HttpResponse<T>> {
   return request<T>({ ...config, url, method: 'PUT', body });
 }
@@ -545,7 +526,7 @@ export function put<T = any>(
  */
 export function del<T = any>(
   url: string,
-  config?: Omit<RequestConfig, 'url' | 'method'>
+  config?: Omit<RequestConfig, 'url' | 'method'>,
 ): Promise<HttpResponse<T>> {
   return request<T>({ ...config, url, method: 'DELETE' });
 }
@@ -560,7 +541,7 @@ export function del<T = any>(
 export function patch<T = any>(
   url: string,
   body?: any,
-  config?: Omit<RequestConfig, 'url' | 'method' | 'body'>
+  config?: Omit<RequestConfig, 'url' | 'method' | 'body'>,
 ): Promise<HttpResponse<T>> {
   return request<T>({ ...config, url, method: 'PATCH', body });
 }
@@ -571,7 +552,7 @@ export function patch<T = any>(
  * @returns Promise<HttpResponse[]>
  */
 export async function batchRequest(
-  configs: RequestConfig[]
+  configs: RequestConfig[],
 ): Promise<HttpResponse[]> {
   return Promise.all(configs.map(config => request(config)));
 }
@@ -609,7 +590,7 @@ export function cancelAllRequests(): void {
 export function upload<T = any>(
   url: string,
   file: File | FormData,
-  config?: Omit<RequestConfig, 'url' | 'method' | 'body'>
+  config?: Omit<RequestConfig, 'url' | 'method' | 'body'>,
 ): Promise<HttpResponse<T>> {
   const formData = file instanceof FormData ? file : new FormData();
   if (file instanceof File) {
@@ -629,7 +610,7 @@ export function upload<T = any>(
 export async function download(
   url: string,
   filename?: string,
-  config?: Omit<RequestConfig, 'url' | 'method'>
+  config?: Omit<RequestConfig, 'url' | 'method'>,
 ): Promise<void> {
   // 直接使用 request 函数获取 blob 响应
   const response = await request<Blob>({
@@ -661,7 +642,7 @@ export function useRequest<T = any>(
     manual?: boolean;
     onSuccess?: (data: T, response: HttpResponse<T>) => void;
     onError?: (error: HttpError) => void;
-  } = {}
+  } = {},
 ): UseRequestResult<T> {
   const { manual = false, onSuccess, onError } = options;
 
@@ -681,7 +662,7 @@ export function useRequest<T = any>(
   };
 
   const run = async (
-    overrideConfig?: Partial<RequestConfig>
+    overrideConfig?: Partial<RequestConfig>,
   ): Promise<HttpResponse<T>> => {
     const finalConfig = { ...lastConfig, ...overrideConfig };
     lastConfig = finalConfig;
@@ -711,7 +692,8 @@ export function useRequest<T = any>(
 
       onSuccess?.(response.data, response);
       return response;
-    } catch (error) {
+    }
+    catch (error) {
       const httpError = error as HttpError;
 
       setState({
@@ -773,7 +755,7 @@ export function createHttpClient(config?: Partial<GlobalConfig>) {
 
   // 客户端请求函数
   const clientRequest = async <T = any>(
-    config: RequestConfig
+    config: RequestConfig,
   ): Promise<HttpResponse<T>> => {
     // 应用客户端拦截器
     let processedConfig = { ...config };
@@ -800,7 +782,8 @@ export function createHttpClient(config?: Partial<GlobalConfig>) {
       }
 
       return response;
-    } catch (error) {
+    }
+    catch (error) {
       // 应用客户端错误拦截器
       let processedError = error as HttpError;
       for (const interceptor of clientErrorInterceptors) {
@@ -837,33 +820,33 @@ export function createHttpClient(config?: Partial<GlobalConfig>) {
     request: clientRequest as <T = any>(config: RequestConfig) => Promise<HttpResponse<T>>,
     get: <T = any>(
       url: string,
-      config?: Omit<RequestConfig, 'url' | 'method'>
+      config?: Omit<RequestConfig, 'url' | 'method'>,
     ): Promise<HttpResponse<T>> => clientRequest<T>({ ...config, url, method: 'GET' }),
     post: <T = any>(
       url: string,
       body?: any,
-      config?: Omit<RequestConfig, 'url' | 'method' | 'body'>
+      config?: Omit<RequestConfig, 'url' | 'method' | 'body'>,
     ): Promise<HttpResponse<T>> => clientRequest<T>({ ...config, url, method: 'POST', body }),
     put: <T = any>(
       url: string,
       body?: any,
-      config?: Omit<RequestConfig, 'url' | 'method' | 'body'>
+      config?: Omit<RequestConfig, 'url' | 'method' | 'body'>,
     ): Promise<HttpResponse<T>> => clientRequest<T>({ ...config, url, method: 'PUT', body }),
     delete: <T = any>(
       url: string,
-      config?: Omit<RequestConfig, 'url' | 'method'>
+      config?: Omit<RequestConfig, 'url' | 'method'>,
     ): Promise<HttpResponse<T>> => clientRequest<T>({ ...config, url, method: 'DELETE' }),
     patch: <T = any>(
       url: string,
       body?: any,
-      config?: Omit<RequestConfig, 'url' | 'method' | 'body'>
+      config?: Omit<RequestConfig, 'url' | 'method' | 'body'>,
     ): Promise<HttpResponse<T>> => clientRequest<T>({ ...config, url, method: 'PATCH', body }),
 
     // 工具方法
     upload: <T = any>(
       url: string,
       file: File | FormData,
-      config?: Omit<RequestConfig, 'url' | 'method' | 'body'>
+      config?: Omit<RequestConfig, 'url' | 'method' | 'body'>,
     ): Promise<HttpResponse<T>> => {
       const formData = file instanceof FormData ? file : new FormData();
       if (file instanceof File) {

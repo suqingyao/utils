@@ -3,10 +3,10 @@
  * @description 在事件被触发n秒后再执行回调，如果在这n秒内又被触发，则重新计时
  */
 
-type DebounceOptions = {
+interface DebounceOptions {
   /** 是否立即执行 */
   immediate?: boolean;
-};
+}
 
 /**
  * 创建防抖函数
@@ -15,35 +15,36 @@ type DebounceOptions = {
  * @param options 配置选项
  * @returns 防抖后的函数
  */
-export function debounce<T extends (...args: any[]) => any>(
+export function debounce<T extends (...args: unknown[]) => unknown>(
   func: T,
   delay: number,
-  options: DebounceOptions = {}
+  options: DebounceOptions = {},
 ): T & { cancel: () => void; flush: () => void } {
   const { immediate = false } = options;
   let timeoutId: NodeJS.Timeout | null = null;
   let lastArgs: Parameters<T> | null = null;
-  let lastThis: any = null;
   let result: ReturnType<T>;
 
-  const debounced = function (this: any, ...args: Parameters<T>) {
-    lastArgs = args;
-    lastThis = this;
-
+  const debounced = function (this: unknown, ...args: Parameters<T>) {
+    // 使用箭头函数捕获当前的 this 上下文
     const callNow = immediate && !timeoutId;
+    lastArgs = args;
 
     if (timeoutId) {
       clearTimeout(timeoutId);
     }
 
+    // 使用箭头函数自动绑定 this
     timeoutId = setTimeout(() => {
       timeoutId = null;
       if (!immediate && lastArgs) {
-        result = func.apply(lastThis, lastArgs);
+        // 使用箭头函数中捕获的 this
+        result = func.apply(this, lastArgs);
       }
     }, delay);
 
     if (callNow) {
+      // 立即执行时也使用当前的 this
       result = func.apply(this, args);
     }
 
@@ -59,7 +60,6 @@ export function debounce<T extends (...args: any[]) => any>(
       timeoutId = null;
     }
     lastArgs = null;
-    lastThis = null;
   };
 
   /**
@@ -69,9 +69,9 @@ export function debounce<T extends (...args: any[]) => any>(
     if (timeoutId && lastArgs) {
       clearTimeout(timeoutId);
       timeoutId = null;
-      result = func.apply(lastThis, lastArgs);
+      // 使用函数本身的上下文
+      result = func(...lastArgs);
       lastArgs = null;
-      lastThis = null;
     }
   };
 

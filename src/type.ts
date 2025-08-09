@@ -34,7 +34,7 @@ export function isString(value: unknown): value is string {
  * @returns 是否为数字
  */
 export function isNumber(value: unknown): value is number {
-  return typeof value === 'number' && !isNaN(value);
+  return typeof value === 'number' && !Number.isNaN(value);
 }
 
 /**
@@ -61,7 +61,7 @@ export function isFunction(value: unknown): value is (...args: unknown[]) => unk
  * @returns 是否为普通对象
  */
 export function isPlainObject(
-  value: unknown
+  value: unknown,
 ): value is Record<string, unknown> {
   return getType(value) === 'object' && value !== null;
 }
@@ -126,14 +126,22 @@ export function isNil(value: unknown): value is null | undefined {
  * @returns 是否为空值
  */
 export function isEmpty(value: unknown): boolean {
-  if (isNil(value)) return true;
-  if (isString(value) || isArray(value)) return value.length === 0;
-  if (isObject(value)) return Object.keys(value).length === 0;
-  if (isPlainObject(value)) return Object.keys(value).length === 0;
-  if (isDate(value)) return isNaN(value.getTime());
-  if (isRegExp(value)) return value.source === '';
-  if (isSymbol(value)) return value.description === '';
-  if (isBigInt(value)) return value.toString() === '0';
+  if (isNil(value))
+    return true;
+  if (isString(value) || isArray(value))
+    return value.length === 0;
+  if (isObject(value))
+    return Object.keys(value).length === 0;
+  if (isPlainObject(value))
+    return Object.keys(value).length === 0;
+  if (isDate(value))
+    return Number.isNaN(value.getTime());
+  if (isRegExp(value))
+    return value.source === '';
+  if (isSymbol(value))
+    return value.description === '';
+  if (isBigInt(value))
+    return value.toString() === '0';
   return false;
 }
 
@@ -143,7 +151,7 @@ export function isEmpty(value: unknown): boolean {
  * @returns 是否为Date对象
  */
 export function isDate(value: unknown): value is Date {
-  return value instanceof Date && !isNaN(value.getTime());
+  return value instanceof Date && !Number.isNaN(value.getTime());
 }
 
 /**
@@ -162,8 +170,8 @@ export function isRegExp(value: unknown): value is RegExp {
  */
 export function isPromise(value: unknown): value is Promise<unknown> {
   return (
-    value instanceof Promise ||
-    (isObject(value) && isFunction((value as any).then))
+    value instanceof Promise
+    || (isObject(value) && isFunction((value as any).then))
   );
 }
 
@@ -203,7 +211,8 @@ export function isBigInt(value: unknown): value is bigint {
 export function safeJsonParse<T = unknown>(str: string, defaultValue: T): T {
   try {
     return JSON.parse(str);
-  } catch {
+  }
+  catch {
     return defaultValue;
   }
 }
@@ -216,11 +225,12 @@ export function safeJsonParse<T = unknown>(str: string, defaultValue: T): T {
  */
 export function safeJsonStringify(
   value: unknown,
-  defaultValue: string = '{}'
+  defaultValue: string = '{}',
 ): string {
   try {
     return JSON.stringify(value);
-  } catch {
+  }
+  catch {
     return defaultValue;
   }
 }
@@ -231,9 +241,12 @@ export function safeJsonStringify(
  * @returns 字符串
  */
 export function toString(value: unknown): string {
-  if (isString(value)) return value;
-  if (isNil(value)) return '';
-  if (isArray(value) || isObject(value)) return safeJsonStringify(value, '');
+  if (isString(value))
+    return value;
+  if (isNil(value))
+    return '';
+  if (isArray(value) || isObject(value))
+    return safeJsonStringify(value, '');
   return String(value);
 }
 
@@ -244,10 +257,11 @@ export function toString(value: unknown): string {
  * @returns 数字
  */
 export function toNumber(value: unknown, defaultValue: number = 0): number {
-  if (isNumber(value)) return value;
+  if (isNumber(value))
+    return value;
   if (isString(value)) {
     const num = Number(value);
-    return isNaN(num) ? defaultValue : num;
+    return Number.isNaN(num) ? defaultValue : num;
   }
   return defaultValue;
 }
@@ -258,11 +272,13 @@ export function toNumber(value: unknown, defaultValue: number = 0): number {
  * @returns 布尔值
  */
 export function toBoolean(value: unknown): boolean {
-  if (isBoolean(value)) return value;
+  if (isBoolean(value))
+    return value;
   if (isString(value)) {
     const lower = value.toLowerCase();
     return lower === 'true' || lower === '1' || lower === 'yes';
   }
-  if (isNumber(value)) return value !== 0;
+  if (isNumber(value))
+    return value !== 0;
   return !isEmpty(value);
 }

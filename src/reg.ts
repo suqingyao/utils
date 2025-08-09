@@ -1,7 +1,7 @@
 /**
  * 邮箱格式正则表达式
  */
-export const emailReg: RegExp = /^[a-zA-Z0-9_]+@[a-zA-Z0-9_]+(\.[a-zA-Z0-9_]+)+$/;
+export const emailReg: RegExp = /^\w+@\w+(\.\w+)+$/;
 
 /**
  * 手机号格式正则表达式
@@ -11,12 +11,12 @@ export const phoneReg: RegExp = /^1[3-9]\d{9}$/;
 /**
  * 密码格式正则表达式
  */
-export const passwordReg: RegExp = /^[a-zA-Z0-9_]{6,16}$/;
+export const passwordReg: RegExp = /^\w{6,16}$/;
 
 /**
  * 身份证格式正则表达式
  */
-export const idCardReg: RegExp = /^\d{17}[\dXx]|\d{15}$/;
+export const idCardReg: RegExp = /^\d{17}[\dX]|\d{15}$/i;
 
 /**
  * 验证邮箱是否符合格式

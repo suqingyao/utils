@@ -19,14 +19,14 @@ type CurriedFunction<T extends (...args: any[]) => any> = T extends (
   : never;
 
 export function curry<T extends (...args: any[]) => any>(
-  func: T
+  func: T,
 ): CurriedFunction<T> {
   return function curried(this: any, ...args: any[]): any {
     if (args.length >= func.length) {
-      return func.apply(this, args);
+      return func.call(this, ...args);
     }
     return function (this: any, ...nextArgs: any[]) {
-      return curried.apply(this, [...args, ...nextArgs]);
+      return curried.call(this, ...args, ...nextArgs);
     };
   } as any;
 }
@@ -43,7 +43,7 @@ export function partial<T extends (...args: any[]) => any>(
   ...args: any[]
 ): (...remainingArgs: any[]) => ReturnType<T> {
   return function (this: any, ...remainingArgs: any[]) {
-    return func.apply(this, [...args, ...remainingArgs]);
+    return func.call(this, ...args, ...remainingArgs);
   };
 }
 
@@ -59,26 +59,17 @@ export const _: symbol = Symbol('placeholder');
  * @returns 支持占位符的柯里化函数
  */
 export function curryWithPlaceholder<T extends (...args: any[]) => any>(
-  func: T
+  func: T,
 ): (...args: any[]) => any {
   return function curried(this: any, ...args: any[]): any {
     const placeholderCount = args.filter(arg => arg === _).length;
     const realArgsCount = args.length - placeholderCount;
 
     if (realArgsCount >= func.length) {
-      // 替换占位符
-      const finalArgs: any[] = [];
-      let argIndex = 0;
+      // 过滤掉占位符，只保留真实参数
+      const finalArgs = args.filter(arg => arg !== _);
 
-      for (const arg of args) {
-        if (arg === _) {
-          finalArgs.push(arguments[argIndex++]);
-        } else {
-          finalArgs.push(arg);
-        }
-      }
-
-      return func.apply(this, finalArgs.slice(0, func.length));
+      return func.call(this, ...finalArgs.slice(0, func.length));
     }
 
     return function (this: any, ...nextArgs: any[]) {
@@ -101,7 +92,7 @@ export function curryWithPlaceholder<T extends (...args: any[]) => any>(
         newArgs.push(nextArgs[nextArgIndex++]);
       }
 
-      return curried.apply(this, newArgs);
+      return curried.call(this, ...newArgs);
     };
   };
 }

@@ -3,12 +3,13 @@
  * @description 基于clsx和tailwind-merge实现的类名合并工具
  */
 
-import { type ClassValue, clsx } from 'clsx';
+import type { ClassValue } from 'clsx';
+import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
 /**
  * 合并类名，支持条件类名和Tailwind CSS类名去重
- * @param inputs 类名输入
+ * @param classes 类名输入
  * @returns 合并后的类名字符串
  */
 export function cn(...classes: ClassValue[]): string {
@@ -29,7 +30,7 @@ export function createVariants<
       [K in keyof T]?: keyof T[K];
     } & {
       className?: string;
-    }
+    },
   ): string {
     const { className, ...variantProps } = props;
 

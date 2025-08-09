@@ -40,7 +40,7 @@ export function randomBoolean(probability: number = 0.5): boolean {
  */
 export function randomString(
   length: number,
-  charset: string = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+  charset: string = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789',
 ): string {
   let result = '';
   for (let i = 0; i < length; i++) {
@@ -59,11 +59,13 @@ export function randomString(
 export function randomAlpha(
   length: number,
   uppercase: boolean = true,
-  lowercase: boolean = true
+  lowercase: boolean = true,
 ): string {
   let charset = '';
-  if (uppercase) charset += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-  if (lowercase) charset += 'abcdefghijklmnopqrstuvwxyz';
+  if (uppercase)
+    charset += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  if (lowercase)
+    charset += 'abcdefghijklmnopqrstuvwxyz';
   return randomString(length, charset);
 }
 
@@ -90,7 +92,7 @@ export function randomAlphaNumeric(length: number): string {
  * @returns 随机颜色字符串
  */
 export function randomColor(): string {
-  return '#' + randomString(6, '0123456789ABCDEF');
+  return `#${randomString(6, '0123456789ABCDEF')}`;
 }
 
 /**
@@ -183,9 +185,7 @@ export function randomUUID(): string {
  * @returns 随机手机号字符串
  */
 export function randomPhoneNumber(): string {
-  const prefixes = ['130', '131', '132', '133', '134', '135', '136', '137', '138', '139',
-                   '150', '151', '152', '153', '155', '156', '157', '158', '159',
-                   '180', '181', '182', '183', '184', '185', '186', '187', '188', '189'];
+  const prefixes = ['130', '131', '132', '133', '134', '135', '136', '137', '138', '139', '150', '151', '152', '153', '155', '156', '157', '158', '159', '180', '181', '182', '183', '184', '185', '186', '187', '188', '189'];
   const prefix = prefixes[randomInt(0, prefixes.length - 1)];
   const suffix = randomNumeric(8);
   return prefix + suffix;
@@ -199,30 +199,30 @@ export function randomIDCard(): string {
   // 地区代码（前6位）
   const areaCodes = ['110000', '120000', '130000', '140000', '150000', '210000', '220000', '230000'];
   const areaCode = areaCodes[randomInt(0, areaCodes.length - 1)];
-  
+
   // 出生日期（8位）
   const year = randomInt(1950, 2005).toString();
   const month = randomInt(1, 12).toString().padStart(2, '0');
   const day = randomInt(1, 28).toString().padStart(2, '0');
   const birthDate = year + month + day;
-  
+
   // 顺序码（3位）
   const sequence = randomNumeric(3);
-  
+
   // 前17位
   const first17 = areaCode + birthDate + sequence;
-  
+
   // 校验码计算
   const weights = [7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2];
   const checkCodes = ['1', '0', 'X', '9', '8', '7', '6', '5', '4', '3', '2'];
-  
+
   let sum = 0;
   for (let i = 0; i < 17; i++) {
-    sum += parseInt(first17[i]) * weights[i];
+    sum += Number.parseInt(first17[i]) * weights[i];
   }
-  
+
   const checkCode = checkCodes[sum % 11];
-  
+
   return first17 + checkCode;
 }
 
@@ -235,13 +235,13 @@ export function randomAddress(): string {
   const cities = ['市', '县'];
   const districts = ['区', '镇', '街道'];
   const roads = ['路', '街', '大道', '巷'];
-  
+
   const province = provinces[randomInt(0, provinces.length - 1)];
   const city = randomAlpha(2) + cities[randomInt(0, cities.length - 1)];
   const district = randomAlpha(2) + districts[randomInt(0, districts.length - 1)];
   const road = randomAlpha(3) + roads[randomInt(0, roads.length - 1)];
-  const number = randomInt(1, 999) + '号';
-  
+  const number = `${randomInt(1, 999)}号`;
+
   return province + city + district + road + number;
 }
 
@@ -276,20 +276,21 @@ export function randomChoices<T>(array: T[], count: number, unique: boolean = tr
   if (unique && count > array.length) {
     throw new Error('Count cannot be greater than array length when unique is true');
   }
-  
+
   const result: T[] = [];
   const availableIndices = Array.from({ length: array.length }, (_, i) => i);
-  
+
   for (let i = 0; i < count; i++) {
     if (unique) {
       const randomIndex = randomInt(0, availableIndices.length - 1);
       const selectedIndex = availableIndices.splice(randomIndex, 1)[0];
       result.push(array[selectedIndex]);
-    } else {
+    }
+    else {
       result.push(randomChoice(array));
     }
   }
-  
+
   return result;
 }
 
