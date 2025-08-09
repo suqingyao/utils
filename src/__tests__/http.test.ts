@@ -70,7 +70,7 @@ globalThis.document = mockDocument as unknown as Document;
 function createMockResponse<T>(
   data: T,
   status = 200,
-  statusText = 'OK'
+  statusText = 'OK',
 ): Response {
   return {
     ok: status >= 200 && status < 300,
@@ -88,7 +88,7 @@ function createMockResponse<T>(
  */
 function createMockErrorResponse(
   status = 500,
-  statusText = 'Internal Server Error'
+  statusText = 'Internal Server Error',
 ): Response {
   return {
     ok: false,
@@ -143,7 +143,7 @@ describe('hTTP 工具函数', () => {
         expect.objectContaining({
           method: 'GET',
           headers: {},
-        })
+        }),
       );
       expect(response.data).toEqual(mockData);
       expect(response.status).toBe(200);
@@ -162,7 +162,7 @@ describe('hTTP 工具函数', () => {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(postData),
-        })
+        }),
       );
       expect(response.data).toEqual(mockData);
     });
@@ -179,7 +179,7 @@ describe('hTTP 工具函数', () => {
         expect.objectContaining({
           method: 'PUT',
           body: JSON.stringify(putData),
-        })
+        }),
       );
       expect(response.data).toEqual(mockData);
     });
@@ -194,7 +194,7 @@ describe('hTTP 工具函数', () => {
         '/api/test/1',
         expect.objectContaining({
           method: 'DELETE',
-        })
+        }),
       );
       expect(response.data).toEqual(mockData);
     });
@@ -211,7 +211,7 @@ describe('hTTP 工具函数', () => {
         expect.objectContaining({
           method: 'PATCH',
           body: JSON.stringify(patchData),
-        })
+        }),
       );
       expect(response.data).toEqual(mockData);
     });
@@ -228,7 +228,7 @@ describe('hTTP 工具函数', () => {
 
       expect(mockFetch).toHaveBeenCalledWith(
         '/api/search?q=test&page=1&active=true',
-        expect.any(Object)
+        expect.any(Object),
       );
     });
 
@@ -242,7 +242,7 @@ describe('hTTP 工具函数', () => {
 
       expect(mockFetch).toHaveBeenCalledWith(
         '/api/search?q=test',
-        expect.any(Object)
+        expect.any(Object),
       );
     });
   });
@@ -254,7 +254,7 @@ describe('hTTP 工具函数', () => {
 
       await get('/api/protected', {
         headers: {
-          Authorization: 'Bearer token123',
+          'Authorization': 'Bearer token123',
           'X-Custom-Header': 'custom-value',
         },
       });
@@ -263,10 +263,10 @@ describe('hTTP 工具函数', () => {
         '/api/protected',
         expect.objectContaining({
           headers: expect.objectContaining({
-            Authorization: 'Bearer token123',
+            'Authorization': 'Bearer token123',
             'X-Custom-Header': 'custom-value',
           }),
-        })
+        }),
       );
     });
 
@@ -289,7 +289,7 @@ describe('hTTP 工具函数', () => {
             'X-Global': 'global-value',
             'X-Local': 'local-value',
           }),
-        })
+        }),
       );
     });
   });
@@ -297,11 +297,11 @@ describe('hTTP 工具函数', () => {
   describe('错误处理', () => {
     it('应该处理 HTTP 错误状态', async () => {
       mockFetch.mockResolvedValueOnce(
-        createMockErrorResponse(404, 'Not Found')
+        createMockErrorResponse(404, 'Not Found'),
       );
 
       await expect(get('/api/notfound')).rejects.toThrow(
-        'HTTP Error: 404 Not Found'
+        'HTTP Error: 404 Not Found',
       );
     });
 
@@ -337,7 +337,7 @@ describe('hTTP 工具函数', () => {
         get('/api/test', {
           retries: 1,
           retryDelay: 10,
-        })
+        }),
       ).rejects.toThrow('Network Error');
 
       expect(mockFetch).toHaveBeenCalledTimes(2);
@@ -365,7 +365,7 @@ describe('hTTP 工具函数', () => {
           headers: expect.objectContaining({
             'X-Intercepted': 'true',
           }),
-        })
+        }),
       );
     });
 
@@ -387,7 +387,7 @@ describe('hTTP 工具函数', () => {
     });
 
     it('应该执行错误拦截器', async () => {
-      const errorInterceptor = vi.fn(error => {
+      const errorInterceptor = vi.fn((error) => {
         error.message = `Intercepted: ${error.message}`;
         return error;
       });
@@ -397,7 +397,7 @@ describe('hTTP 工具函数', () => {
       mockFetch.mockRejectedValueOnce(new Error('Original Error'));
 
       await expect(get('/api/test')).rejects.toThrow(
-        'Intercepted: Original Error'
+        'Intercepted: Original Error',
       );
       expect(errorInterceptor).toHaveBeenCalled();
     });
@@ -496,7 +496,7 @@ describe('hTTP 工具函数', () => {
         expect.objectContaining({
           method: 'POST',
           body: expect.any(FormData),
-        })
+        }),
       );
       expect(response.data).toEqual(mockData);
     });
@@ -514,7 +514,7 @@ describe('hTTP 工具函数', () => {
         expect.objectContaining({
           method: 'POST',
           body: formData,
-        })
+        }),
       );
       expect(response.data).toEqual(mockData);
     });
@@ -543,14 +543,14 @@ describe('hTTP 工具函数', () => {
         click: vi.fn(),
       };
       mockDocument.createElement.mockReturnValue(
-        mockLink as unknown as MockHTMLAnchorElement
+        mockLink as unknown as MockHTMLAnchorElement,
       );
 
       await download('/api/download/file.txt', 'downloaded.txt');
 
       expect(mockFetch).toHaveBeenCalledWith(
         '/api/download/file.txt',
-        expect.objectContaining({ method: 'GET' })
+        expect.objectContaining({ method: 'GET' }),
       );
       expect(mockDocument.createElement).toHaveBeenCalledWith('a');
       expect(mockLink.download).toBe('downloaded.txt');
@@ -586,7 +586,7 @@ describe('hTTP 工具函数', () => {
 
       expect(mockFetch).toHaveBeenCalledWith(
         'https://api.example.com/users',
-        expect.any(Object)
+        expect.any(Object),
       );
     });
   });
@@ -609,7 +609,7 @@ describe('hTTP 工具函数', () => {
           headers: expect.objectContaining({
             'X-Client': 'test',
           }),
-        })
+        }),
       );
       expect(response.data).toEqual(mockData);
     });
@@ -636,7 +636,7 @@ describe('hTTP 工具函数', () => {
             'X-Client-Interceptor': 'true',
             'X-API-Key': 'key123',
           }),
-        })
+        }),
       );
     });
   });
@@ -663,7 +663,7 @@ describe('hTTP 工具函数', () => {
 
       const hookResult = useRequest(
         { url: '/api/hook-manual', method: 'GET' },
-        { manual: true }
+        { manual: true },
       );
 
       expect(hookResult.data).toBeNull();
@@ -682,7 +682,7 @@ describe('hTTP 工具函数', () => {
       const onError = vi.fn();
       const hookResult = useRequest(
         { url: '/api/hook-error', method: 'GET' },
-        { onError }
+        { onError },
       );
 
       // 等待异步请求完成
@@ -700,7 +700,7 @@ describe('hTTP 工具函数', () => {
         () =>
           new Promise(() => {
             /* 永远不会 resolve */
-          })
+          }),
       );
 
       const hookResult = useRequest({ url: '/api/hook-cancel', method: 'GET' });

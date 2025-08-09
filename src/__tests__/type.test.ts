@@ -42,7 +42,7 @@ describe('类型工具函数', () => {
       expect(
         getType(() => {
           /* 空函数用于测试 */
-        })
+        }),
       ).toBe('function');
       expect(getType(new Date())).toBe('date');
       expect(getType(/test/)).toBe('regexp');
@@ -99,22 +99,22 @@ describe('类型工具函数', () => {
       expect(
         isFunction(() => {
           /* 空函数用于测试 */
-        })
+        }),
       ).toBe(true);
       expect(
         isFunction(() => {
           /* 空函数用于测试 */
-        })
+        }),
       ).toBe(true);
       expect(
         isFunction(async () => {
           /* 空异步函数用于测试 */
-        })
+        }),
       ).toBe(true);
       expect(
         isFunction(function* () {
           /* 空生成器函数用于测试 */
-        })
+        }),
       ).toBe(true);
       expect(isFunction(Array.prototype.push)).toBe(true);
       expect(isFunction(Date)).toBe(true);
@@ -248,15 +248,15 @@ describe('类型工具函数', () => {
         isPromise(
           Promise.reject(new Error('test')).catch(() => {
             /* 空函数用于测试 */
-          })
-        )
+          }),
+        ),
       ).toBe(true);
       expect(
         isPromise(
           new Promise(() => {
             /* 空函数用于测试 */
-          })
-        )
+          }),
+        ),
       ).toBe(true);
 
       // thenable 对象
@@ -265,7 +265,7 @@ describe('类型工具函数', () => {
           then: () => {
             /* 空函数用于测试 */
           },
-        })
+        }),
       ).toBe(true);
       expect(isPromise({ then: 'not a function' })).toBe(false);
 
@@ -351,7 +351,7 @@ describe('类型工具函数', () => {
           b: () => {
             /* 空函数用于测试 */
           },
-        })
+        }),
       ).toBe('{"a":1}');
     });
   });
@@ -431,7 +431,7 @@ describe('类型工具函数', () => {
       expect(
         toBoolean(() => {
           /* 空函数用于测试 */
-        })
+        }),
       ).toBe(true); // 函数对象不被 isEmpty 认为是空的
     });
   });

@@ -32,5 +32,5 @@ export default antfu(
       'antfu/if-newline': 'off',
       'style/brace-style': 'warn',
     },
-  }
+  },
 );
