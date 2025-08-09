@@ -1,6 +1,6 @@
 {
   "name": "suqingyao/outils",
-  "version": "1.0.0",
+  "version": "0.0.0",
   "description": "个人常用工具函数库",
   "type": "module",
   "packageManager": "pnpm@10.14.0",
