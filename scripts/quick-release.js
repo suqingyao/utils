@@ -103,7 +103,7 @@ function quickRelease() {
 
     // 1. 运行测试
     log.info('Running tests...');
-    exec('pnpm run test');
+    exec('pnpm run test:ci');
 
     // 2. 构建项目
     log.info('Building project...');
