@@ -31,7 +31,7 @@ if (!_raf || !_caf) {
   }
 }
 
-const raf = _raf.bind(target);
-const caf = _caf.bind(target);
+const raf: typeof _raf = _raf.bind(target);
+const caf: typeof _caf = _caf.bind(target);
 
 export { caf, raf };
