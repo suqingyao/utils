@@ -3,7 +3,7 @@
  * 提供原生 dayjs 实例，用户可根据需要自行扩展插件
  */
 
-import dayjs from 'dayjs';
+import * as dayjs from 'dayjs';
 
 // 常用日期格式常量
 export const DATE_FORMATS = {
