@@ -1,3 +1,0 @@
-{
-  "pre-commit": "npm run lint && npx commitlint --edit $1"
-}

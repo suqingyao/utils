@@ -1,0 +1,56 @@
+{
+  "name": "@suqingyao/utils",
+  "type": "module",
+  "version": "0.0.4",
+  "description": "个人常用工具函数库",
+  "author": "suqingyao",
+  "license": "MIT",
+  "keywords": [
+    "utils",
+    "typescript",
+    "tools",
+    "functions",
+    "http"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "LICENSE",
+    "README.md",
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "lint": "eslint src --max-warnings 100",
+    "lint:fix": "eslint src --fix",
+    "test": "vitest",
+    "test:ci": "vitest run",
+    "test:coverage": "vitest --coverage"
+  },
+  "peerDependencies": {
+    "typescript": ">=4.0.0"
+  },
+  "peerDependenciesMeta": {
+    "typescript": {
+      "optional": true
+    }
+  },
+  "dependencies": {
+    "clsx": "^2.0.0",
+    "dayjs": "^1.11.10",
+    "tailwind-merge": "^2.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

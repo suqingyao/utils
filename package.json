@@ -1,89 +1,36 @@
 {
-  "name": "@suqingyao/utils",
+  "name": "@suqingyao/core",
   "type": "module",
-  "version": "0.0.4",
-  "packageManager": "pnpm@10.14.0",
-  "description": "个人常用工具函数库",
+  "version": "1.0.0",
+  "private": true,
+  "description": "personal monorepo",
   "author": "suqingyao",
   "license": "MIT",
   "keywords": [
+    "monorepo",
     "utils",
     "typescript",
-    "tools",
-    "functions",
-    "http"
-  ],
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
-    }
-  },
-  "main": "dist/index.cjs",
-  "module": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "files": [
-    "LICENSE",
-    "README.md",
-    "dist",
-    "src"
+    "tools"
   ],
   "scripts": {
-    "build": "tsdown",
-    "commit": "cz",
-    "dev": "tsdown --watch",
-    "docs:build": "vitepress build docs",
-    "docs:dev": "vitepress dev docs",
-    "docs:preview": "vitepress preview docs",
-    "lint": "eslint src --max-warnings 100",
-    "lint:fix": "eslint src --fix",
-    "prepare": "simple-git-hooks",
-    "prepublishOnly": "npm run build && npm run test:ci",
-    "release": "node scripts/release.js",
-    "release:quick": "node scripts/quick-release.js",
-    "release:sh": "./scripts/release.sh",
-    "test": "vitest",
-    "test:ci": "vitest run",
-    "test:coverage": "vitest --coverage"
-  },
-  "config": {
-    "commitizen": {
-      "path": "./node_modules/cz-conventional-changelog"
-    }
-  },
-  "peerDependencies": {
-    "typescript": ">=4.0.0"
-  },
-  "peerDependenciesMeta": {
-    "typescript": {
-      "optional": true
-    }
-  },
-  "dependencies": {
-    "clsx": "^2.0.0",
-    "dayjs": "^1.11.10",
-    "tailwind-merge": "^2.0.0"
+    "build": "turbo run build",
+    "dev": "turbo run dev --parallel",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "test:watch": "turbo run test:watch",
+    "changeset": "changeset && changeset version",
+    "release": "pnpm run build && changeset version && changeset publish"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^5.2.0",
-    "@commitlint/cli": "^18.4.3",
-    "@commitlint/config-angular": "^18.4.3",
-    "@commitlint/config-conventional": "^18.4.3",
-    "@types/node": "^20.10.0",
-    "@vitest/coverage-v8": "^1.0.0",
-    "commitizen": "^4.3.0",
-    "cz-conventional-changelog": "^3.3.0",
     "eslint": "^9.0.0",
-    "happy-dom": "^18.0.1",
-    "prettier": "^3.1.0",
-    "simple-git-hooks": "^2.13.1",
-    "tsdown": "^0.2.13",
-    "typescript": "^5.3.0",
-    "vitepress": "^1.0.0",
-    "vitest": "^1.0.0"
+    "turbo": "^1.10.15",
+    "tsup": "^7.2.0",
+    "typescript": "^5.2.2",
+    "vitest": "^0.34.6"
   },
-  "publishConfig": {
-    "access": "public"
-  }
+  "engines": {
+    "node": ">=18",
+    "pnpm": ">=10"
+  },
+  "packageManager": "pnpm@10.14.0"
 }
