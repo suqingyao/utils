@@ -1,9 +1,7 @@
 import antfu from '@antfu/eslint-config';
 
 export default antfu({
-  // 启用 TypeScript 支持
   typescript: true,
-  // 代码风格配置
   stylistic: {
     indent: 2,
     quotes: 'single',

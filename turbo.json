@@ -1,21 +1,68 @@
 {
   "$schema": "https://turborepo.org/schema.json",
+  "globalDependencies": [
+    "**/.env.*local",
+    ".env",
+    "tsconfig.json",
+    "turbo.json"
+  ],
+  "globalEnv": [
+    "NODE_ENV",
+    "CI"
+  ],
   "pipeline": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": ["dist/**"]
+      "inputs": [
+        "src/**/*.{ts,tsx,js,jsx}",
+        "!src/**/*.{test,spec}.{ts,tsx,js,jsx}",
+        "package.json",
+        "tsconfig.json",
+        "tsconfig.*.json"
+      ],
+      "outputs": ["dist/**", ".turbo/**"],
+      "env": ["NODE_ENV"]
     },
     "lint": {
-      "outputs": []
+      "inputs": [
+        "src/**/*.{ts,tsx,js,jsx}",
+        "eslint.config.js",
+        "eslint.config.*",
+        "package.json"
+      ],
+      "outputs": [".eslintcache"]
     },
-    "test": {
-      "outputs": []
+    "lint:fix": {
+      "inputs": [
+        "src/**/*.{ts,tsx,js,jsx}",
+        "eslint.config.js",
+        "eslint.config.*",
+        "package.json"
+      ],
+      "outputs": [".eslintcache"],
+      "cache": false
     },
-    "test:watch": {
+    "typecheck": {
+      "dependsOn": ["^build"],
+      "inputs": [
+        "src/**/*.{ts,tsx}",
+        "tsconfig.json",
+        "tsconfig.*.json",
+        "package.json"
+      ],
+      "outputs": ["*.tsbuildinfo"]
+    },
+    "clean": {
       "cache": false
     },
     "dev": {
-      "cache": false
+      "cache": false,
+      "persistent": true
+    },
+    "start": {
+      "dependsOn": ["build"],
+      "cache": false,
+      "persistent": true
     }
   }
 }

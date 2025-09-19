@@ -1,7 +1,7 @@
 {
   "name": "@suqingyao/utils",
   "type": "module",
-  "version": "0.0.4",
+  "version": "1.0.0",
   "description": "个人常用工具函数库",
   "author": "suqingyao",
   "license": "MIT",
@@ -32,13 +32,10 @@
     "build": "tsup",
     "dev": "tsup --watch",
     "lint": "eslint src --max-warnings 100",
-    "lint:fix": "eslint src --fix",
-    "test": "vitest",
-    "test:ci": "vitest run",
-    "test:coverage": "vitest --coverage"
+    "lint:fix": "eslint src --fix"
   },
   "peerDependencies": {
-    "typescript": ">=4.0.0"
+    "typescript": "^5.2.2"
   },
   "peerDependenciesMeta": {
     "typescript": {
@@ -46,9 +43,15 @@
     }
   },
   "dependencies": {
+    "class-variance-authority": "^0.7.1",
     "clsx": "^2.0.0",
     "dayjs": "^1.11.10",
     "tailwind-merge": "^2.0.0"
+  },
+  "devDependencies": {
+    "@suqingyao/tsconfig": "workspace:*",
+    "@types/node": "^24.5.2",
+    "tsup": "^8.5.0"
   },
   "publishConfig": {
     "access": "public"

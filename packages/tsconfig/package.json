@@ -1,6 +1,8 @@
 {
   "name": "@suqingyao/tsconfig",
-  "version": "0.0.1",
+  "version": "1.0.0",
+  "description": "@suqingyao包的共享TypeScript配置",
+  "author": "suqingyao",
   "license": "MIT",
   "files": [
     "base.json",
@@ -9,5 +11,9 @@
     "public-base.json"
   ],
   "peerDependencies": {
+    "typescript": "^5.2.2"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

@@ -28,6 +28,9 @@ export {
 
 // 函数式编程
 export { curry, curryWithPlaceholder, partial } from './curry';
+// CVA 工具
+export * from './cva';
+
 // 时间工具 - dayjs
 export * from './dayjs';
 
