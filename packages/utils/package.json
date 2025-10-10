@@ -32,7 +32,8 @@
     "build": "tsup",
     "dev": "tsup --watch",
     "lint": "eslint src --max-warnings 100",
-    "lint:fix": "eslint src --fix"
+    "lint:fix": "eslint src --fix",
+    "test": "vitest"
   },
   "peerDependencies": {
     "typescript": "^5.2.2"
@@ -51,7 +52,9 @@
   "devDependencies": {
     "@suqingyao/tsconfig": "workspace:*",
     "@types/node": "^24.5.2",
-    "tsup": "^8.5.0"
+    "happy-dom": "^19.0.2",
+    "tsup": "^8.5.0",
+    "vitest": "^3.2.4"
   },
   "publishConfig": {
     "access": "public"
