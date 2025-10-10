@@ -71,6 +71,8 @@ export * from './storage-manager';
 
 export { throttle } from './throttle';
 
+export * from './to';
+
 // 类型工具
 export * from './type';
 
