@@ -54,6 +54,9 @@ export {
   type ResponseInterceptor,
 } from './http';
 
+// 字符串工具
+export * from './letter';
+
 // RAF 工具
 export * from './raf';
 
@@ -64,7 +67,7 @@ export * from './random';
 export * from './reg';
 
 // 存储工具
-export * from './storage';
+export * from './storage-manager';
 
 export { throttle } from './throttle';
 

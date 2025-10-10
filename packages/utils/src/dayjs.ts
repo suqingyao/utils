@@ -3,7 +3,7 @@
  * 提供原生 dayjs 实例，用户可根据需要自行扩展插件
  */
 
-import * as dayjs from 'dayjs';
+import dayjs from 'dayjs';
 
 // 常用日期格式常量
 export const DATE_FORMATS = {
@@ -18,7 +18,32 @@ export const DATE_FORMATS = {
   YEAR_MONTH: 'YYYY-MM',
 } as const;
 
-// 导出原生 dayjs，用户可以直接使用所有 dayjs API
+export function formatDate(
+  time: number | string,
+  format = DATE_FORMATS.DATE as string,
+) {
+  try {
+    const date = dayjs(time);
+
+    if (!date.isValid()) {
+      throw new Error('Invalid date time');
+    }
+    return date.format(format);
+  }
+  catch (error) {
+    console.error(`Error formatting date: ${error}`);
+    return time;
+  }
+}
+
+export function formatDateTime(time: number | string) {
+  return formatDate(time, DATE_FORMATS.DATETIME);
+}
+
+export function isDayjsObject(value: any): value is dayjs.Dayjs {
+  return dayjs.isDayjs(value);
+}
+
 export { dayjs };
 export default dayjs;
 
