@@ -110,11 +110,3 @@ export class EventEmitter {
     this.events = {};
   }
 }
-
-/**
- * 创建一个新的事件发布订阅器实例
- * @returns EventEmitter实例
- */
-export function createEventEmitter(): EventEmitter {
-  return new EventEmitter();
-}

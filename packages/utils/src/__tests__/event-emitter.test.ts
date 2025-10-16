@@ -3,7 +3,7 @@
  */
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { createEventEmitter, EventEmitter } from '../event-emitter';
+import { EventEmitter } from '../event-emitter';
 
 describe('eventEmitter', () => {
   let emitter: EventEmitter;
@@ -187,12 +187,5 @@ describe('eventEmitter', () => {
 
       expect(emitter.eventNames()).toHaveLength(0);
     });
-  });
-});
-
-describe('createEventEmitter', () => {
-  it('should create new EventEmitter instance', () => {
-    const emitter = createEventEmitter();
-    expect(emitter).toBeInstanceOf(EventEmitter);
   });
 });
