@@ -1,4 +1,4 @@
-export * from './class-names';
+export * from './cn';
 export * from './compose';
 export * from './concurrency';
 export * from './curry';
