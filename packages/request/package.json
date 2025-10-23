@@ -1,0 +1,32 @@
+{
+  "name": "request",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "",
+  "author": "",
+  "license": "ISC",
+  "keywords": [],
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "LICENSE",
+    "README.md",
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "test": "vitest run",
+    "lint": "eslint src --max-warnings 100",
+    "lint:fix": "eslint src --fix"
+  },
+  "dependencies": {
+    "axios": "^1.12.2"
+  },
+  "devDependencies": {
+    "@suqingyao/tsconfig": "workspace:*",
+    "@types/node": "^24.5.2",
+    "happy-dom": "^19.0.2",
+    "vitest": "^3.2.4"
+  }
+}
