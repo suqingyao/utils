@@ -13,11 +13,10 @@
     "build": "turbo run build",
     "dev": "turbo run dev --parallel",
     "lint": "turbo run lint",
-    "lint:fix": "turbo run lint:fix",
-    "typecheck": "turbo run typecheck",
-    "clean": "turbo run clean && rm -rf node_modules/.pnpm",
-    "clean:all": "pnpm clean && rm -rf node_modules",
-    "release": "changeset publish",
+    "test": "turbo run test",
+    "test:watch": "turbo run test:watch",
+    "changeset": "changeset && changeset version",
+    "release": "pnpm run build && changeset version && changeset publish",
     "preinstall": "npx only-allow pnpm"
   },
   "devDependencies": {
