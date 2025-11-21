@@ -3,9 +3,13 @@
   "type": "module",
   "version": "1.0.1",
   "description": "",
-  "author": "",
+  "author": "suqingyao",
   "license": "ISC",
-  "keywords": [],
+  "keywords": [
+    "request",
+    "axios",
+    "http"
+  ],
   "main": "dist/index.cjs",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
