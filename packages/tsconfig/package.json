@@ -1,6 +1,6 @@
 {
   "name": "@suqingyao/tsconfig",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "@suqingyao包的共享TypeScript配置",
   "author": "suqingyao",
   "license": "MIT",
