@@ -1,5 +1,11 @@
 # @suqingyao/utils
 
+## 3.0.0
+
+### Major Changes
+
+- add utils
+
 ## 2.0.0
 
 ### Major Changes
