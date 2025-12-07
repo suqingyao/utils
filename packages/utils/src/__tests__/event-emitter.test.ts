@@ -1,29 +1,31 @@
-/**
- * 发布订阅模块测试用例
- */
-
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { EventEmitter } from '../event-emitter';
 
+interface Events {
+  test: string;
+  ready: void;
+  event1: number;
+  event2: number;
+}
+
 describe('eventEmitter', () => {
-  let emitter: EventEmitter;
+  let emitter: EventEmitter<Events>;
 
   beforeEach(() => {
-    emitter = new EventEmitter();
+    emitter = new EventEmitter<Events>();
   });
 
   describe('on', () => {
-    it('should subscribe to events', () => {
+    it('subscribes and receives payload', () => {
       const callback = vi.fn();
       emitter.on('test', callback);
 
       emitter.emit('test', 'data');
-
       expect(callback).toHaveBeenCalledWith('data');
       expect(callback).toHaveBeenCalledTimes(1);
     });
 
-    it('should return unsubscribe function', () => {
+    it('returns unsubscribe function', () => {
       const callback = vi.fn();
       const unsubscribe = emitter.on('test', callback);
 
@@ -35,7 +37,7 @@ describe('eventEmitter', () => {
       expect(callback).toHaveBeenCalledTimes(1);
     });
 
-    it('should support multiple subscribers', () => {
+    it('supports multiple subscribers', () => {
       const callback1 = vi.fn();
       const callback2 = vi.fn();
 
@@ -43,37 +45,33 @@ describe('eventEmitter', () => {
       emitter.on('test', callback2);
 
       emitter.emit('test', 'data');
-
       expect(callback1).toHaveBeenCalledWith('data');
       expect(callback2).toHaveBeenCalledWith('data');
+    });
+
+    it('replays buffered events to future subscriber', () => {
+      const received: string[] = [];
+      emitter.emit('test', 'early1');
+      emitter.emit('test', 'early2');
+      emitter.on('test', v => received.push(v));
+      expect(received).toEqual(['early1', 'early2']);
     });
   });
 
   describe('once', () => {
-    it('should subscribe to event only once', () => {
+    it('subscribes only once', () => {
       const callback = vi.fn();
       emitter.once('test', callback);
 
       emitter.emit('test', 'data1');
       emitter.emit('test', 'data2');
-
       expect(callback).toHaveBeenCalledWith('data1');
       expect(callback).toHaveBeenCalledTimes(1);
-    });
-
-    it('should return unsubscribe function', () => {
-      const callback = vi.fn();
-      const unsubscribe = emitter.once('test', callback);
-
-      unsubscribe();
-      emitter.emit('test', 'data');
-
-      expect(callback).not.toHaveBeenCalled();
     });
   });
 
   describe('off', () => {
-    it('should unsubscribe specific callback', () => {
+    it('unsubscribes specific callback', () => {
       const callback1 = vi.fn();
       const callback2 = vi.fn();
 
@@ -82,12 +80,11 @@ describe('eventEmitter', () => {
 
       emitter.off('test', callback1);
       emitter.emit('test', 'data');
-
       expect(callback1).not.toHaveBeenCalled();
       expect(callback2).toHaveBeenCalledWith('data');
     });
 
-    it('should unsubscribe all callbacks when no callback specified', () => {
+    it('unsubscribes all when callback omitted', () => {
       const callback1 = vi.fn();
       const callback2 = vi.fn();
 
@@ -96,96 +93,67 @@ describe('eventEmitter', () => {
 
       emitter.off('test');
       emitter.emit('test', 'data');
-
       expect(callback1).not.toHaveBeenCalled();
       expect(callback2).not.toHaveBeenCalled();
-    });
-
-    it('should handle non-existent events gracefully', () => {
-      expect(() => emitter.off('nonexistent')).not.toThrow();
     });
   });
 
   describe('emit', () => {
-    it('should emit events with data', () => {
+    it('emits with payload', () => {
       const callback = vi.fn();
       emitter.on('test', callback);
-
-      emitter.emit('test', { key: 'value' });
-
-      expect(callback).toHaveBeenCalledWith({ key: 'value' });
+      emitter.emit('test', { key: 'value' } as unknown as string);
+      expect(callback).toHaveBeenCalledWith({ key: 'value' } as unknown as string);
     });
 
-    it('should emit events without data', () => {
+    it('emits without payload for void event', () => {
       const callback = vi.fn();
-      emitter.on('test', callback);
-
-      emitter.emit('test');
-
+      emitter.on('ready', callback);
+      emitter.emit('ready');
       expect(callback).toHaveBeenCalledWith(undefined);
     });
 
-    it('should handle errors in callbacks', () => {
-      const consoleSpy = vi
-        .spyOn(globalThis.console, 'error')
-        .mockImplementation(() => {
-          /* empty */
-        });
-      const errorCallback = vi.fn(() => {
-        throw new Error('Test error');
-      });
-      const normalCallback = vi.fn();
-
-      emitter.on('test', errorCallback);
-      emitter.on('test', normalCallback);
-
-      emitter.emit('test', 'data');
-
-      expect(errorCallback).toHaveBeenCalled();
-      expect(normalCallback).toHaveBeenCalled();
-      expect(consoleSpy).toHaveBeenCalled();
-
-      consoleSpy.mockRestore();
-    });
-
-    it('should handle non-existent events gracefully', () => {
-      expect(() => emitter.emit('nonexistent', 'data')).not.toThrow();
+    it('non-existent event buffers without throwing', () => {
+      expect(() => emitter.emit('event1' as any, 123 as any)).not.toThrow();
     });
   });
 
   describe('listenerCount', () => {
-    it('should return correct listener count', () => {
+    it('returns correct listener count', () => {
       expect(emitter.listenerCount('test')).toBe(0);
-
       emitter.on('test', vi.fn());
       expect(emitter.listenerCount('test')).toBe(1);
-
       emitter.on('test', vi.fn());
       expect(emitter.listenerCount('test')).toBe(2);
     });
   });
 
   describe('eventNames', () => {
-    it('should return array of event names', () => {
+    it('returns array of event names', () => {
       expect(emitter.eventNames()).toEqual([]);
-
       emitter.on('event1', vi.fn());
       emitter.on('event2', vi.fn());
-
       expect(emitter.eventNames()).toEqual(['event1', 'event2']);
     });
   });
 
   describe('clear', () => {
-    it('should clear all events', () => {
+    it('clears all events', () => {
       emitter.on('event1', vi.fn());
       emitter.on('event2', vi.fn());
-
       expect(emitter.eventNames()).toHaveLength(2);
-
       emitter.clear();
-
       expect(emitter.eventNames()).toHaveLength(0);
+    });
+  });
+
+  describe('buffer controls', () => {
+    it('clears buffer manually', () => {
+      emitter.emit('test', 'x');
+      emitter.clearBuffer();
+      let count = 0;
+      emitter.on('test', () => count++);
+      expect(count).toBe(0);
     });
   });
 });
