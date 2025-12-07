@@ -282,3 +282,5 @@ export function toBoolean(value: unknown): boolean {
     return value !== 0;
   return !isEmpty(value);
 }
+
+export function noop() {}
